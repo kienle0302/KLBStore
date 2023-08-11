@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+    <head>
+        <title>KLB Store</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="breadcrumb-area">
+                <div class="container">
+                    <div class="breadcrumb-content">
+                        <ul>
+                            <li><a href="/user/index">Trang chủ</a></li>
+                            <li class="active">Wishlist</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wishlist-area pt-60 pb-60">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <form action="#">
+                                <div class="table-content table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="li-order-id">Mã đơn hàng</th>
+                                                <th class="li-order-discount">Giảm giá</th>
+                                                <th class="li-product-price">Hình thức thanh toán</th>
+                                                <th class="li-product-stock-status">Ngày đặt hàng</th>
+                                                <th class="li-product-address">Địa chỉ giao hàng</th>
+                                                <th class="li-product-address">Tình trạng thanh toán</th>
+                                                <th class="li-product-address">Tổng đơn hàng</th>
+                                                <th class="li-product-details">Xem chi tiết</th>
+                                                <th class="li-product-add-cart" th:if="${donHangs.tinhTrangThanhToan == null or donHangs.tinhTrangThanhToan == false}">Thanh toán</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="donHang : ${donHangs}">
+                                                <td class="li-order-id" th:text="${donHang.donHangId}"></td>
+                                                <td class="li-order-discount" th:text="${donHang.GiamGiaTrucTiep}"></td>
+                                                <td class="li-product-price" th:text="${donHang.hinhThucThanhToan.tenHinhThucThanhToan}"></td>
+                                                <td class="li-product-stock-status" th:text="${#temporals.format(donHang.ngayDatHang, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                                                <td class="li-product-address" th:text="${donHang.diaChiGiaoHang}"></td>
+                                                <td th:text="${donHang.tinhTrangThanhToan == null or donHang.tinhTrangThanhToan == false} ? 'Chưa thanh toán' : 'Đã thanh toán'"></td>
+                                                <td class="li-product-total" th:text="${#numbers.formatDecimal(donHang.tongTienSanPham + donHang.phiVanChuyen, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></td>
+                                                <td class="li-product-details"><a th:href="@{'/user/order-details?donHangId=' + ${donHang.donHangId}}">Xem chi tiết</a></td>
+                                                <td class="li-product-add-cart" th:if="${donHangs.tinhTrangThanhToan == null or donHangs.tinhTrangThanhToan == false}"><a th:href="@{|/user/recheckout?orderId=${donHangs.donHangId}|}">Thanh toán bằng Ví VNPAY</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

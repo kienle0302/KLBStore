@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+    <head>
+        <title>KLB Store</title>
+    </head>
+
+    <body>
+        <div layout:fragment="content">
+            <div class="breadcrumb-area">
+                <div class="container">
+                    <div class="breadcrumb-content">
+                        <ul>
+                            <li><a href="/user/index">Trang chủ</a></li>
+                            <li class="active">Thông tin cá nhân</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkout-area pt-60 pb-30" ng-controller="info">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col col-lg-6">
+                            <form action="/user/profile" th:object="${userProfile}" method="post">
+                                <div class="checkbox-form">
+                                    <h3>
+                                        Thông tin <small>& <a th:href="@{/user/profile/change-password/__${userProfile.email}__}">Đổi mật khẩu</a></small>
+                                    </h3>
+                                    <div class="col-12">
+                                        <div th:if="${message}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                                            <span th:text="${message}"></span>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="checkout-form-list">
+                                                <label>Tên đăng nhập <span class="required">*</span></label>
+                                                <input th:field="*{tenDangNhap}" placeholder="Tên đăng nhập" type="text" />
+                                                <span class="text-danger error" th:if="${#fields.hasErrors('tenDangNhap')}" th:errors="*{tenDangNhap}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="checkout-form-list">
+                                                <label>Ngày sinh </label>
+                                                <input placeholder="Ngày sinh" type="date" th:field="*{ngaySinh}" style="background-color: white;" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="checkout-form-list">
+                                                <label>Họ và tên <span class="required">*</span></label>
+                                                <input th:field="*{hoTen}" placeholder="Họ và tên" type="text" />
+                                                <span class="text-danger error" th:if="${#fields.hasErrors('hoTen')}" th:errors="*{hoTen}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="checkout-form-list">
+                                                <label>Giới tính </label>
+                                                <select th:field="*{gioiTinh}" style="background-color: white;">
+                                                    <option th:value="'true'" th:text="Nam"></option>
+                                                    <option th:value="'false'" th:text="Nữ"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="checkout-form-list">
+                                                <label>Số điện thoại <span class="required">*</span></label>
+                                                <input th:field="*{sdt}" placeholder="Số điện thoại" type="text" />
+                                                <span class="text-danger error" th:if="${#fields.hasErrors('sdt')}" th:errors="*{sdt}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="checkout-form-list">
+                                                <label>Địa chỉ </label>
+                                                <input th:field="*{diaChi}" placeholder="Địa chỉ" type="text" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="checkout-form-list">
+                                                <label>Tỉnh/Thành phố:</label>
+                                                <select th:data-province="*{tinhThanh}" id="tinhThanh" ng-model="selectedProvince" ng-change="getDistricts()" th:field="*{tinhThanh}">
+                                                    <option value="" disabled selected hidden>Chọn tỉnh/thành phố</option>
+                                                    <option ng-repeat="province in provinces" value="{{province.ProvinceName}}">{{province.ProvinceName}}</option>
+                                                </select>                                                
+                                                <span class="text-danger error" th:if="${#fields.hasErrors('tinhThanh')}" th:errors="*{tinhThanh}"></span>
+                                            </div>
+                                        </div>                                        
+                                        <div class="col-md-12">
+                                            <div class="checkout-form-list">
+                                                <label>Quận/Huyện:</label>
+                                                <select th:data-district="*{quanHuyen}" ng-model="selectedDistrict" ng-change="getWards()" th:field="*{quanHuyen}">
+                                                    <option value="" disabled selected hidden>Chọn quận/huyện</option>
+                                                    <option ng-repeat="district in districts" value="{{district.DistrictName}}">{{district.DistrictName}}</option>
+                                                </select>                                                
+                                                <span class="text-danger error" th:if="${#fields.hasErrors('quanHuyen')}" th:errors="*{quanHuyen}"></span>
+                                            </div>
+                                        </div>    
+                                        <div class="col-md-12">
+                                            <div class="checkout-form-list">
+                                                <label>Xã/Phường:</label>
+                                                <select th:data-ward="*{xaPhuong}" ng-model="selectedWard" th:field="*{xaPhuong}">
+                                                    <option value="" disabled selected hidden>Chọn xã/phường</option>
+                                                    <option ng-repeat="ward in wards" value="{{ ward.WardName }}">{{ ward.NameExtension[0] }}</option>
+                                                </select>
+                                                <span class="text-danger error" th:if="${#fields.hasErrors('xaPhuong')}" th:errors="*{xaPhuong}"></span>
+                                            </div>   
+                                        </div>                                        
+                                        <div class="col-md-12">
+                                            <div class="checkout-form-list">
+                                                <label>Email <span class="required">*</span></label>
+                                                <input th:field="*{email}" placeholder="Email" type="email" />
+                                                <span class="text-danger error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="checkout-form-list">
+                                                <div class="order-button-payment">
+                                                    <button class="btn btn-primary">Cập nhật thông tin</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

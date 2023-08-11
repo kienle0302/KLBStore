@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}">
+<head>
+  <title>KLB Store</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+			<div class="pd-ltr-20 xs-pd-20-10">
+				<div class="min-height-200px">
+					<div class="page-header">
+						<div class="row">
+							<div class="col-md-6 col-sm-12">
+								<div class="title">
+									<h4>Quản Lý Đơn Hàng</h4>
+								</div>
+								<nav aria-label="breadcrumb" role="navigation">
+									<ol class="breadcrumb">
+										<li class="breadcrumb-item">
+											<a href="/home">Trang Chủ</a>
+										</li>
+										<li class="breadcrumb-item active" aria-current="page">
+											Quản Lý Đơn Hàng
+										</li>
+									</ol>
+								</nav>
+							</div>
+							<!-- <div class="col-md-6 col-sm-12 text-right">
+								<div class="dropdown">
+									<a class="btn btn-primary dropdown-toggle" href="#" role="button"
+										data-toggle="dropdown">
+										January 2018
+									</a>
+									<div class="dropdown-menu dropdown-menu-right">
+										<a class="dropdown-item" href="#">Export List</a>
+										<a class="dropdown-item" href="#">Policies</a>
+										<a class="dropdown-item" href="#">View Assets</a>
+									</div>
+								</div>
+							</div> -->
+						</div>
+					</div>
+		
+					<!-- Default Basic Forms Start -->
+					<div class="pd-20 card-box mb-30">
+						<div class="clearfix">
+							<div class="pull-left">
+								<h4 class="text-blue h4">Quản Lý Đơn Hàng</h4>
+								<!-- <p class="mb-30">All bootstrap element classies</p> -->
+							</div>
+					
+						</div>
+						<form action="#" th:action="@{/admin/donhang/save}" method="post" th:object="${items}">
+							<div class="form-group row">
+								<!-- <label class="col-sm-12 col-md-2 col-form-label">Mã Đơn Hàng</label> -->
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{donHangId}" class="form-control" type="hidden" placeholder="" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Tên Người Dùng</label>
+								
+								<div class="col-sm-12 col-md-10">
+									<select th:field="*{nguoiDung.nguoiDungId}" class="custom-select col-12">
+										<option th:each="nd : ${nguoiDungTenNguoiDung}" th:value="${nd.key}" th:text="${nd.value}"></option>
+										
+									</select>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Giảm Giá Trực Tiếp</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{giamGiaTrucTiep}" class="form-control" type="text" placeholder="" />
+									<span class="text-danger" th:if="${#fields.hasErrors('giamGiaTrucTiep')}" th:errors="*{giamGiaTrucTiep}"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Hình Thức Thanh Toán</label>
+								
+								<div class="col-sm-12 col-md-10">
+									<select th:field="*{hinhThucThanhToan.hinhThucThanhToanId}" class="custom-select col-12">
+										<option value="1">Tại Cửa Hàng</option>
+										<option value="2">Ví VN Pay</option>
+									</select>
+								</div>
+							</div>
+							
+							<div class="form-group row">
+								<label for="example-datetime-local-input" class="col-sm-12 col-md-2 col-form-label">Ngày
+									Đặt Hàng</label>
+								<div class="col-sm-12 col-md-10">
+									<input readonly th:field="*{ngayDatHang}" class="form-control" placeholder="dd/MM/yy" type="datetime" />
+									
+								</div>
+							</div>
+							<div class="form-group row">
+								<label for="example-datetime-local-input" class="col-sm-12 col-md-2 col-form-label">Ngày
+									Giao Hàng</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{ngayGiaoHang}" class="form-control" placeholder="dd-MM-yyyy" type="date" />
+									<span class="text-danger" th:if="${#fields.hasErrors('ngayGiaoHang')}" th:errors="*{ngayGiaoHang}"></span>
+								</div>
+							</div>
+							
+							<div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Địa Chỉ Giao Hàng</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <textarea th:field="*{diaChiGiaoHang}" class="form-control" placeholder="Xã, Phường, Quận, Huyện, Tỉnh"></textarea>
+									<span class="text-danger" th:if="${#fields.hasErrors('diaChiGiaoHang')}" th:errors="*{diaChiGiaoHang}"></span>
+								</div>
+                            </div>
+							<div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Ghi Chú</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <textarea th:field="*{ghiChu}" class="form-control" placeholder=""></textarea>
+                                </div>
+                            </div>
+							<div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Tình Trạng Thanh Toán</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <select th:field="*{tinhTrangThanhToan}" class="custom-select col-12">
+                                        <option value="false">Chưa Thanh Toán</option>
+										<option value="true">Đã Thanh Toán</option>
+                                    </select>
+                                </div>
+                            </div>
+							<div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Tình Trạng Giao Hàng</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <select th:field="*{tinhTrangGiaoHang}" class="custom-select col-12">
+                                        <option value="false">Chưa Giao Hàng</option>
+										<option value="true">Đã Giao Hàng</option>
+                                    </select>
+                                </div>
+                            </div>
+							<div class="row">
+								<div class="col align-self-end">
+									<button class="btn btn-outline-success">Lưu</button>
+					
+								</div>
+							</div>
+						</form>
+					
+					</div>
+	
+					<!-- Default Basic Forms End -->
+					<div class="footer-wrap pd-20 mb-20 card-box">
+						Web Design by
+						<a href="#" target="_blank">KLB</a>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+</body>
+</html>

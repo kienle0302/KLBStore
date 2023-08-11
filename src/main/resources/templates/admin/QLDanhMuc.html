@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}">
+<head>
+  <title>KLB Store</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+			<div class="pd-ltr-20 xs-pd-20-10">
+				<div class="min-height-200px">
+					<div class="page-header">
+						<div class="row">
+							<div class="col-md-6 col-sm-12">
+								<div class="title">
+									<h4>Quản Lý Danh Mục</h4>
+								</div>
+								<nav aria-label="breadcrumb" role="navigation">
+									<ol class="breadcrumb">
+										<li class="breadcrumb-item">
+											<a th:href="@{/admin/index}">Trang Chủ</a>
+										</li>
+										<li class="breadcrumb-item active" aria-current="page">
+											Quản Lý Danh Mục
+										</li>
+									</ol>
+								</nav>
+							</div>
+							<div class="col-md-6 col-sm-12 text-right">
+							</div>
+						</div>
+					</div>
+					<!-- Default Basic Forms Start -->
+					<div class="pd-20 card-box mb-30">
+						<div class="clearfix">
+							<div class="pull-left">
+								<h4 class="text-blue h4">Quản Lý Danh Mục</h4>
+								<!-- <p class="mb-30">All bootstrap element classies</p> -->
+							</div>
+					
+						</div>
+						<form action="#" th:action="@{/admin/danhmuc/save}" method="post" th:object="${items}">
+							<div class="form-group row">
+								<!-- <label class="col-sm-12 col-md-2 col-form-label">Mã Danh Mục</label> -->
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{danhMucSanPhamId}" class="form-control" type="hidden" placeholder="" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Tên Danh Mục</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{tenDanhMucSanPham}" class="form-control" type="text" placeholder="" />
+									<span class="text-danger" th:if="${#fields.hasErrors('tenDanhMucSanPham')}" th:errors="*{tenDanhMucSanPham}"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Nhóm Sản Phẩm</label>
+								<div class="col-sm-12 col-md-10">
+									<select th:field="*{nhomSanPham.nhomSanPhamId}" class="custom-select col-12">
+										<option value="2">Laptop</option>
+										<option value="1">Điện Thoại</option>
+									</select>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col align-self-end">
+									<button class="btn btn-outline-success">Lưu</button>
+					
+								</div>
+							</div>
+						</form>
+					
+					</div>
+	
+					<!-- Default Basic Forms End -->
+	
+	
+					<div class="footer-wrap pd-20 mb-20 card-box">
+						Web Design by
+						<a href="#" target="_blank">KLB</a>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+</body>
+</html>

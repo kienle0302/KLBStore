@@ -1,0 +1,91 @@
+<div class="footer">
+    <div class="footer-static-middle">
+        <div class="container">
+            <div class="footer-logo-wrap pt-50 pb-35">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="footer-logo">
+                            <img src="/assets/user/images/menu/logo/logo.svg" alt="Footer Logo" />
+                            <p class="info" align="justify">
+                                KLB Store chuyên cung cấp các sản phẩm điện thoại, laptop, phụ kiện chính hãng với giá cả phải chăng, chất lượng đảm bảo. Chúng tôi luôn mong muốn mang đến cho khách hàng những sản phẩm tốt nhất, dịch vụ chăm
+                                sóc khách hàng tốt nhất.
+                            </p>
+                        </div>
+                        <ul class="des">
+                            <li>
+                                <span>Địa chỉ: </span>
+                                Số 288, Nguyễn Văn Linh, phường An Khánh, quận Ninh Kiều, Tp. Cần Thơ.
+                            </li>
+                            <li>
+                                <span>Số điện thoại: </span>
+                                <a href="#">(0292) 7300 468</a>
+                            </li>
+                            <li>
+                                <span>Email: </span>
+                                <a href="mailto://klbstore@gmail.com">klbstore@gmail.com"</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3 col-sm-6">
+                        <div class="footer-block">
+                            <h3 class="footer-block-title">Sản phẩm</h3>
+                            <ul>
+                                <li th:each="nhomSanPham : ${nhomSanPhamList}">
+                                    <a th:href="@{'/user/shop-list?nhomSanPhamId=' + ${nhomSanPham.nhomSanPhamId}}" th:text="${nhomSanPham.tenNhomSanPham}"></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3 col-sm-6">
+                        <div class="footer-block">
+                            <h3 class="footer-block-title">Về Chúng Tôi</h3>
+                            <ul>
+                                <li><a href="/user/contact">Liên hệ</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="footer-block">
+                            <h3 class="footer-block-title">Theo dõi chúng tôi tại</h3>
+                            <ul class="social-link">
+                                <li class="twitter">
+                                    <a href="https://twitter.com/" data-toggle="tooltip" target="_blank" title="Twitter">
+                                        <i class="fa fa-twitter"></i>
+                                    </a>
+                                </li>
+                                <li class="rss">
+                                    <a href="https://rss.com/" data-toggle="tooltip" target="_blank" title="RSS">
+                                        <i class="fa fa-rss"></i>
+                                    </a>
+                                </li>
+                                <li class="google-plus">
+                                    <a href="https://www.plus.google.com/discover" data-toggle="tooltip" target="_blank" title="Google Plus">
+                                        <i class="fa fa-google-plus"></i>
+                                    </a>
+                                </li>
+                                <li class="facebook">
+                                    <a href="https://www.facebook.com/" data-toggle="tooltip" target="_blank" title="Facebook">
+                                        <i class="fa fa-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="youtube">
+                                    <a href="https://www.youtube.com/" data-toggle="tooltip" target="_blank" title="Youtube">
+                                        <i class="fa fa-youtube"></i>
+                                    </a>
+                                </li>
+                                <li class="instagram">
+                                    <a href="https://www.instagram.com/" data-toggle="tooltip" target="_blank" title="Instagram">
+                                        <i class="fa fa-instagram"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

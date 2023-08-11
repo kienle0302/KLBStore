@@ -1,0 +1,109 @@
+<header>
+    <div class="header-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    <div class="header-top-left">
+                        <ul class="phone-wrap">
+                            <li><span>Số điện thoại: </span><a href="#">0292 7300 468</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-9 col-md-8">
+                    <div class="header-top-right">
+                        <ul class="ht-menu">
+                            <li>
+                                <div class="ht-setting-trigger"><span>Cài đặt</span></div>
+                                <div class="setting ht-setting">
+                                    <ul class="ht-setting-list">
+                                        <li th:if="${useHeader}"><a href="/user/profile">Tài khoản</a></li>
+                                        <li th:if="${useHeader}"><a href="/user/order">Đơn mua</a></li>
+                                        <li th:if="!${useHeader}"><a href="/user/login-register">Đăng nhập</a></li>
+                                        <li th:if="${useHeader}"><a href="/user/log-out">Đăng xuất</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-middle pl-sm-0 pr-sm-0 pl-xs-0 pr-xs-0">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="logo pb-sm-30 pb-xs-30">
+                        <a href="/user/index">
+                            <img src="/assets/user/images/menu/logo/logo.svg" alt="" />
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-9 pl-0 ml-sm-15 ml-xs-15">
+                    <form action="/user/search" class="hm-searchbox" method="GET">
+                        <select class="nice-select select-search-category">
+                            <option value="0">Tất cả</option>
+                        </select>
+                        <input name="keywords" type="text" placeholder="Bạn tìm gì ..." />
+                        <button class="li-btn" type="submit"><i class="fa fa-search"></i></button>
+                    </form>
+
+                    <div class="header-middle-right">
+                        <ul class="hm-menu">
+                            <li class="hm-minicart" th:if="${(tongSoSanPham != null AND tongTien != null) == true}">
+                                <div class="hm-minicart-trigger" onclick="location.href='/user/shopping-cart';">
+                                    <span class="item-icon"></span>
+                                    <span class="item-text">
+                                        <span class="tongTien" th:text="${#numbers.formatDecimal(tongTien, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                        <span id="tongSoSanPham" class="cart-item-count" th:text="${#numbers.formatDecimal(tongSoSanPham, 0, 'COMMA', 0, 'POINT')}"></span>
+                                    </span>
+                                </div>
+                                <span></span>
+                            </li>
+                            <li class="hm-minicart" th:if="${(tongSoSanPham != null AND tongTien != null) == false}">
+                                <div class="hm-minicart-trigger" onclick="location.href='/user/shopping-cart';">
+                                    <span class="item-icon"></span>
+                                    <span class="item-text">
+                                        <span class="tongTien">0 ₫</span>
+                                        <span id="tongSoSanPham" class="cart-item-count">0</span>
+                                    </span>
+                                </div>
+                                <span></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-bottom header-sticky d-none d-lg-block d-xl-block">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="hb-menu">
+                        <nav>
+                            <ul>
+                                <li><a href="/user/index">Trang chủ</a></li>
+                                <li th:each="nhomSanPham : ${nhomSanPhamList}">
+                                    <a th:href="@{'/user/shop-list?nhomSanPhamId=' + ${nhomSanPham.nhomSanPhamId}}" th:text="${nhomSanPham.tenNhomSanPham}"></a>
+                                </li>
+                                <li><a href="/user/contact">Liên hệ</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-menu-area d-lg-none d-xl-none col-12">
+        <div class="container">
+            <div class="row">
+                <div class="mobile-menu"></div>
+            </div>
+        </div>
+    </div>
+</header>

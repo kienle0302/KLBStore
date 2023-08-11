@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}">
+<head>
+  <title>KLB Store</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+			<div class="pd-ltr-20 xs-pd-20-10">
+				<div class="min-height-200px">
+					<div class="page-header">
+						<div class="row">
+							<div class="col-md-6 col-sm-12">
+								<div class="title">
+									<h4>Quản Lý Nhà Cung Cấp</h4>
+								</div>
+								<nav aria-label="breadcrumb" role="navigation">
+									<ol class="breadcrumb">
+										<li class="breadcrumb-item">
+											<a href="index.html">Trang Chủ</a>
+										</li>
+										<li class="breadcrumb-item active" aria-current="page">
+											Quản Lý Nhà Cung Cấp
+										</li>
+									</ol>
+								</nav>
+							</div>
+							<div class="col-md-6 col-sm-12 text-right">
+								
+							</div>
+						</div>
+					</div>
+					<!-- Default Basic Forms Start -->
+					<div class="pd-20 card-box mb-30">
+						<div class="clearfix">
+							<div class="pull-left">
+								<h4 class="text-blue h4">Quản Lý Nhà Cung Cấp</h4>
+								<!-- <p class="mb-30">All bootstrap element classies</p> -->
+							</div>
+	
+						</div>
+						<form name="fValidation" action="#" th:action="@{/admin/nhacungcap/save}" th:object="${nhaCungCap}" onsubmit="return luu()" method="post">
+							<div class="form-group row">
+								<!-- <label class="col-sm-12 col-md-2 col-form-label">Mã Nhà Cung Cấp</label> -->
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{nhaCungCapId}" class="form-control js-nhacungcapid" type="hidden" placeholder=""/>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Tên Nhà Cung Cấp</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{tenNhaCungCap}" class="form-control" type="text" placeholder="" />
+									<span class="text-danger" th:if="${#fields.hasErrors('tenNhaCungCap')}" th:errors="*{tenNhaCungCap}"></span>
+								</div>
+							</div>
+	
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Tên Giao Dịch</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{tenGiaoDich}" class="form-control" type="text" placeholder="" />
+									<span class="text-danger" th:if="${#fields.hasErrors('tenGiaoDich')}" th:errors="*{tenGiaoDich}"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Email</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{email}" class="form-control" type="text" placeholder="" />
+									<span class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Số Điện Thoại</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{sdt}" class="form-control" type="number" placeholder="XX-XXXX-XXXX" />
+									<span class="text-danger" th:if="${#fields.hasErrors('sdt')}" th:errors="*{sdt}"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Hiển Thị</label>
+								<div class="col-sm-12 col-md-10">
+									<select th:field="*{hienThi}" class="custom-select col-12">
+										<option value="true">Hiển Thị</option>
+										<option value="false">Ẩn</option>
+									</select>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col align-self-end">
+									<button class="btn btn-outline-success">Lưu</button>
+	
+								</div>
+							</div>
+						</form>
+	
+					</div>
+	
+					<!-- Default Basic Forms End -->
+	
+	
+					<div class="footer-wrap pd-20 mb-20 card-box">
+						Web Design by
+						<a href="#" target="_blank">KLB</a>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+	<!-- <script>
+		
+		function luu() {
+			let iNhaCungCapId = document.forms["fValidation"]["nhaCungCapId"].value;
+			console.log(iNhaCungCapId)
+			if (iNhaCungCapId == "") {
+				alert("Name must be filled out");
+    			return false;
+			}
+		}
+	</script> -->
+</body>
+</html>

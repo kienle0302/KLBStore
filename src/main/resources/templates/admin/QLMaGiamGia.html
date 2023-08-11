@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}"
+  taglib uri="http://www.springframework.org/tags" prefix="s">
+<head>
+  <title>KLB Store</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+			<div class="pd-ltr-20 xs-pd-20-10">
+				<div class="min-height-200px">
+					<div class="page-header">
+						<div class="row">
+							<div class="col-md-6 col-sm-12">
+								<div class="title">
+									<h4>Quản Lý Mã Giảm Giá</h4>
+								</div>
+								<nav aria-label="breadcrumb" role="navigation">
+									<ol class="breadcrumb">
+										<li class="breadcrumb-item">
+											<a href="index.html">Trang Chủ</a>
+										</li>
+										<li class="breadcrumb-item active" aria-current="page">
+											Quản Lý Mã Giảm Giá
+										</li>
+									</ol>
+								</nav>
+							</div>
+							<div class="col-md-6 col-sm-12 text-right">
+							</div>
+						</div>
+					</div>
+					<!-- Default Basic Forms Start -->
+					<div class="pd-20 card-box mb-30">
+						<div class="clearfix">
+							<div class="pull-left">
+								<h4 class="text-blue h4">Quản Lý Mã Giảm Giá</h4>
+							</div>
+	
+						</div>
+						<form action="#" th:action="@{/admin/magiamgia/save}" method="post" th:object="${items}">
+							<div class="form-group row">
+								<!-- <label class="col-sm-12 col-md-2 col-form-label">Mã Giảm Giá</label> -->
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{giamGiaId}" class="form-control" type="hidden" placeholder="" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Tên Giảm Giá</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{tenGiamGia}" class="form-control" type="text" placeholder="" />
+									<span class="text-danger" th:if="${#fields.hasErrors('tenGiamGia')}" th:errors="*{tenGiamGia}"></span>
+								</div>
+							</div>
+	
+							<div class="form-group row">
+								<label for="example-datetime-local-input" class="col-sm-12 col-md-2 col-form-label">Ngày
+									Bắt Đầu</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{ngayBatDau}" class="form-control" placeholder="dd/MM/yyyy"
+										type="date" />
+										<span class="text-danger" th:if="${#fields.hasErrors('ngayBatDau')}" th:errors="*{ngayBatDau}"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label for="example-datetime-local-input" class="col-sm-12 col-md-2 col-form-label">Ngày
+									Kết Thúc</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{ngayKetThuc}" class="form-control" placeholder="dd-MM-yyyy"
+										type="date" />
+										<span class="text-danger" th:if="${#fields.hasErrors('ngayKetThuc')}" th:errors="*{ngayKetThuc}"></span>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Mức Giảm Giá</label>
+								
+								<div class="col-sm-12 col-md-10">
+									<select th:field="*{mucGiamGia}" class="custom-select col-12">
+										<option th:value="0.05">5%</option>
+										<option th:value="0.1">10%</option>
+										<option th:value="0.15">15%</option>
+										<option th:value="0.2">20%</option>
+										<option th:value="0.25">25%</option>
+										<option th:value="0.3">30%</option>
+									</select>
+								</div>
+							</div>
+							
+							<div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Mô Tả</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <textarea th:field="*{moTa}" class="form-control" placeholder=""></textarea>
+                                </div>
+                            </div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Hiển Thị</label>
+								<div class="col-sm-12 col-md-10">
+									<select th:field="*{hienThi}" class="custom-select col-12">
+										<option value="true">Hiển Thị</option>
+										<option value="false">Ẩn</option>
+									</select>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col align-self-end">
+									<button class="btn btn-outline-success">Lưu</button>
+	
+								</div>
+							</div>
+						</form>
+	
+					</div>
+	
+					<!-- Default Basic Forms End -->
+	
+	
+					<div class="footer-wrap pd-20 mb-20 card-box">
+						Web Design by
+						<a href="#" target="_blank">KLB</a>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+</body>
+</html>

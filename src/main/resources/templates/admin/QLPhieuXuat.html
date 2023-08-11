@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}">
+<head>
+  <title>KLB Store</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+			<div class="pd-ltr-20 xs-pd-20-10">
+				<div class="min-height-200px">
+					<div class="page-header">
+						<div class="row">
+							<div class="col-md-6 col-sm-12">
+								<div class="title">
+									<h4>Quản lý phiếu nhập xuất</h4>
+								</div>
+								<nav aria-label="breadcrumb" role="navigation">
+									<ol class="breadcrumb">
+										<li class="breadcrumb-item">
+											<a href="index3.html">Trang Chủ</a>
+										</li>
+										<li class="breadcrumb-item active" aria-current="page">
+											Quản lý phiếu nhập xuất
+										</li>
+									</ol>
+								</nav>
+							</div>
+						</div>
+					</div>
+					<!-- Default Basic Forms Start -->
+					<div class="pd-20 card-box mb-30">
+						<div class="clearfix">
+							<div class="pull-left">
+								<h4 class="text-blue h4">Quản lý phiếu xuất</h4>
+								<!-- <p class="mb-30">All bootstrap element classies</p> -->
+							</div>
+	
+						</div>
+						<form action th:action="@{/admin/phieuxuat/save}" method="post" th:object="${items}">
+							<div class="form-group row">
+								<!-- <label class="col-sm-12 col-md-2 col-form-label">Mã Phiếu Xuất</label> -->
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{phieuXuatId}" class="form-control" type="hidden" placeholder="" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-12 col-md-2 col-form-label">Tên Người Dùng</label>
+								<div class="col-sm-12 col-md-10">
+                                    <select th:field="*{nguoiDung.nguoiDungId}" class="custom-select col-12">
+                                        <option th:each="nd : ${nguoiDungTenNguoiDung}" th:value="${nd.key}" th:text="${nd.value}"></option>
+                                    </select>
+                                </div>
+							</div>
+							
+							
+							<div class="form-group row">
+								<label for="example-datetime-local-input" class="col-sm-12 col-md-2 col-form-label">Ngày Xuất</label>
+								<div class="col-sm-12 col-md-10">
+									<input th:field="*{ngayXuat}" class="form-control" placeholder="dd-MM-yyyy" type="date" />
+									<span class="text-danger" th:if="${#fields.hasErrors('ngayXuat')}" th:errors="*{ngayXuat}"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col align-self-end">
+									<button class="btn btn-outline-success">Lưu</button>
+	
+								</div>
+							</div>
+						</form>
+	
+					</div>
+					<!-- Default Basic Forms End -->
+					
+					<div class="footer-wrap pd-20 mb-20 card-box">
+						KLB - Công ty trách nhiệm hữu hạng 3 thành viên
+						<a href="https://github.com/chibao2k3" target="_blank">ChiBao2k3</a>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+</body>
+</html>

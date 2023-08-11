@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+    <head>
+        <title>KLB Store</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="breadcrumb-area">
+                <div class="container">
+                    <div class="breadcrumb-content">
+                        <ul>
+                            <li><a href="/user/index">Trang chủ</a></li>
+                            <li class="active">Thanh toán</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkout-area pt-60 pb-30">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6 col-12">
+                            <form action="/user/checkout" method="POST" id="checkoutForm">
+                                <div class="checkbox-form">
+                                    <h3>Chi tiết thanh toán</h3>
+                                    <input type="hidden" id="selectedPaymentMethod" th:value="${paymentMethods[0].hinhThucThanhToanId}" />
+                                    <button type="submit" id="paymentNow" style="display: none;"></button>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="checkout-form-list">
+                                                <label>Tên <span class="required">*</span></label>
+                                                <input placeholder="" type="text" th:value="${nguoiDung.hoTen}" disabled/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="checkout-form-list">
+                                                <label>Địa chỉ <span class="required">*</span></label>
+                                                <input placeholder="Địa chỉ" type="text" th:value="${nguoiDung.diaChi}" disabled/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="checkout-form-list">
+                                                <label>Số điện thoại <span class="required">*</span></label>
+                                                <input placeholder="" type="text" th:value="${nguoiDung.sdt}" disabled/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-6 col-12">
+                            <div class="your-order">
+                                <h3>Đơn hàng của bạn</h3>
+                                <div class="your-order-table table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th class="product-name">Sản phẩm</th>
+                                                <th class="product-total">Tổng cộng</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="cart_item" th:each="item: ${cart.get('danhSachSanPhamTrongGioHang')}">
+                                                <td class="product-name">[[${item.get('tenSanPham').asText()}]] <strong class="product-quantity">× [[${item.get('chiTietGioHang').get('soLuong')}]]</strong></td>
+                                                <td class="product-total">
+                                                    <span class="amount" th:text="${#numbers.formatDecimal(item.get('tongGia').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="order-total">
+                                                <th>Phí vận chuyển</th>
+                                                <td th:text="${#strings.equals(cart.get('tongPhiVanChuyen').asDouble(), '0')} ? 'Chúng tôi vẫn chưa hỗ trợ giao hàng ở khu vực của bạn, vui lòng đến cửa hàng nhận nhé.' : ${#numbers.formatDecimal(cart.get('tongPhiVanChuyen').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                                </td>
+                                            </tr>
+                                            <tr class="order-total">
+                                                <th>Ngày giao hàng dự kiến</th>
+                                                <td th:text="${#strings.contains(cart.get('ngayGiaoHangDuKien').asText(), 'null')} ? 'Chưa xác định' : ${cart.get('ngayGiaoHangDuKien').asText()}"> 
+                                                    <strong th:text="${cart.get('ngayGiaoHangDuKien').asText()}"></strong>
+                                                </td>
+                                            </tr>
+                                            <tr class="order-total">
+                                                <th>Tổng tiền sản phẩm</th>
+                                                <td>
+                                                    <strong><span class="amount" th:text="${#numbers.formatDecimal(cart.get('tongTien').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span></strong>
+                                                </td>
+                                            </tr>
+                                            <tr class="order-total">
+                                                <th>Tổng cộng</th>
+                                                <td>
+                                                    <strong><span class="amount" th:text="${#numbers.formatDecimal(cart.get('tongTien').asDouble() + cart.get('tongPhiVanChuyen').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span></strong>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                <div class="payment-method">
+                                    <div class="payment-accordion">
+                                        <div id="accordion">
+                                            <div id="accordion">
+                                                <div th:each="paymentMethod, status : ${paymentMethods}" class="card" th:class="${status.first ? 'actives' : ''}">
+                                                    <div class="card-header" th:id="'heading' + ${paymentMethod.hinhThucThanhToanId}">
+                                                        <h5>
+                                                            <a
+                                                                href="#"
+                                                                th:data-toggle="collapse"
+                                                                th:data-target="'#collapse' + ${paymentMethod.hinhThucThanhToanId}"
+                                                                th:aria-expanded="${status.first ? 'true' : 'false'}"
+                                                                th:aria-controls="'collapse' + ${paymentMethod.hinhThucThanhToanId}"
+                                                                th:text="${paymentMethod.tenHinhThucThanhToan}"
+                                                                th:onclick="'javascript:updateSelectedPaymentMethod(\'' + ${paymentMethod.hinhThucThanhToanId} + '\')'"
+                                                            ></a>
+                                                        </h5>
+                                                    </div>
+                                                    <div
+                                                        th:id="'collapse' + ${paymentMethod.hinhThucThanhToanId}"
+                                                        class="collapse"
+                                                        th:aria-labelledby="'heading' + ${paymentMethod.hinhThucThanhToanId}"
+                                                        data-parent="#accordion"
+                                                        th:classappend="${status.first ? 'show' : ''}"
+                                                    >
+                                                        <div class="card-body">
+                                                            <p th:text="${paymentMethod.moTa}"></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <script>
+                                                function updateSelectedPaymentMethod(paymentMethodId) {
+                                                    const selectedPaymentMethod = document.getElementById("selectedPaymentMethod");
+                                                    selectedPaymentMethod.value = paymentMethodId;
+                                                }
+                                            </script>
+                                        </div>
+                                        <div class="order-button-payment">
+                                            <input id="checkoutBtn" value="Đặt hàng" type="submit" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}">
+<head>
+  <title>KLB Store</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+            <div class="pd-ltr-20 xs-pd-20-10">
+                <div class="min-height-200px">
+                    <div class="page-header">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="title">
+                                    <h4>Thống Kê Tồn Kho</h4>
+                                </div>
+                                <nav aria-label="breadcrumb" role="navigation">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="/admin/index">Trang Chủ</a>
+                                        </li>
+                                        <li class="breadcrumb-item active" aria-current="page">
+                                            Thống Kê Tồn Kho
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+        
+                        </div>
+                    </div>
+        
+                    <!-- Simple Datatable start -->
+                    <div class="card-box mb-30">
+                        <div class="pd-20">
+                            <p class="mb-0">
+                                <h5 class="title">Danh Mục</h5>
+                            </p>
+                        </div>
+                        <div class="pb-20">
+                            
+                            <table class="data-table table stripe hover nowrap">
+                                
+                                <thead>
+                                    <tr>
+                                        <th class="table-plus"><a th:href="@{/admin/danhmuc?sortBy=danhMucSanPhamId}">Danh Mục</a></th>
+                                        <th><a th:href="@{/admin/danhmuc?sortBy=tenDanhMucSanPham}">Tên Danh Mục</a></th>
+                                        <th><a th:href="@{/admin/danhmuc?sortBy=}">Tồn Kho</a></th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="danhMuc : ${items}">
+                                        <td th:text="${danhMuc.maDanhMuc}" class="table-plus"></td>
+                                        <td th:text="${danhMuc.tenDanhMuc}"></td>
+                                        <td th:text="${danhMuc.soLuong}"></td>
+                                        
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </div>
+                    <!-- Simple Datatable End -->
+
+                    
+                    <div class="footer-wrap pd-20 mb-20 card-box">
+                        Web Design by
+                        <a href="#" target="_blank">KLB</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

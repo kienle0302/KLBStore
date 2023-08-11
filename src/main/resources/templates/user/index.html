@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+    <head>
+        <title>KLB Store</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="slider-with-banner">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8 col-md-8">
+                            <div class="slider-area">
+                                <div class="slider-active owl-carousel">
+                                    <div class="single-slide align-center-left animation-style-01 bg-1">
+                                        <div class="slider-progress"></div>
+                                        <div class="slider-content">
+                                            <h5>Sale Off <span>-20% </span> Tuần Này</h5>
+                                            <h2>Samsung Galaxy S9 | S9+</h2>
+                                            <h3>Giá khởi đầu <span>3.690.000 ₫</span></h3>
+                                            <div class="default-btn slide-btn">
+                                                <a class="links" href="http://localhost:8080/user/shop-list?nhomSanPhamId=1">Mua Ngay</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="single-slide align-center-left animation-style-02 bg-2">
+                                        <div class="slider-progress"></div>
+                                        <div class="slider-content">
+                                            <h5>Sale <span>Black Friday</span> Tuần Này</h5>
+                                            <h2>Work Desk Surface Studio 2018</h2>
+                                            <h3>Giá khởi đầu <span>12.990.000 ₫</span></h3>
+                                            <div class="default-btn slide-btn">
+                                                <a class="links" href="http://localhost:8080/user/shop-list?nhomSanPhamId=1">Mua Ngay</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 text-center pt-xs-30">
+                            <div class="li-banner">
+                                <a>
+                                    <img
+                                        src="https://firebasestorage.googleapis.com/v0/b/fir-e2be5.appspot.com/o/user%2Fimages%2Fbanner%2F1_1.webp?alt=media&token=c33b9c85-187f-418c-bd5a-dc69d29a898a&_gl=1*1yspb3g*_ga*NjcxOTQzNTAzLjE2ODEzNjQ0NjI.*_ga_CW55HF8NVT*MTY4NjA2Njg0NC4zLjEuMTY4NjA2NzUxOC4wLjAuMA.."
+                                        alt=""
+                                    />
+                                </a>
+                            </div>
+                            <div class="li-banner mt-15 mt-sm-30 mt-xs-30">
+                                <a>
+                                    <img
+                                        src="https://firebasestorage.googleapis.com/v0/b/fir-e2be5.appspot.com/o/user%2Fimages%2Fbanner%2F1_2.webp?alt=media&token=cfc4fc7b-8ca8-4d4a-b01f-9928842fbf17&_gl=1*hnwdak*_ga*NjcxOTQzNTAzLjE2ODEzNjQ0NjI.*_ga_CW55HF8NVT*MTY4NjA2Njg0NC4zLjEuMTY4NjA2NzYyNi4wLjAuMA.."
+                                        alt=""
+                                    />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <section class="product-area li-laptop-product li-trendding-products best-sellers pt-60 pb-45">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="li-section-title">
+                                <h2>
+                                    <span>Sản phẩm nổi bật</span>
+                                </h2>
+                            </div>
+                            <div class="row">
+                                <div class="product-active owl-carousel">
+                                    <div class="col-lg-12" th:each="product : ${noiBat}">
+                                        <div class="single-product-wrap">
+                                            <div class="product-image">
+                                                <a th:href="@{|/user/product-details?productId=${product.get('sanPham').get('sanPhamId')}&productName=${product.get('sanPham').get('tenSanPham').asText()}|}">
+                                                    <img th:src="${product.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('duongDanAnh').asText()}" alt="Li's Product Image" />
+                                                </a>
+                                                <span class="sticker">New</span>
+                                            </div>
+                                            <div class="product_desc">
+                                                <div class="product_desc_info">
+                                                    <div class="product-review">
+                                                        <h5 class="manufacturer">
+                                                            <a href="http://localhost:8080/user/shop-list?nhomSanPhamId=1" th:text="${product.get('sanPham').get('danhMucSanPham').get('tenDanhMucSanPham').asText()} + ' Brand'"></a>
+                                                        </h5>
+                                                        <div class="rating-box">
+                                                            <ul class="rating">
+                                                                <th:block th:with="totalStars=${#numbers.sequence(1, 5)}">
+                                                                    <th:block th:with="soSao=${#strings.contains(product.get('soSao'), 'null') ? 0 : product.get('soSao').asInt()}">
+                                                                        <th:block th:each="star : ${totalStars}">
+                                                                            <li th:class="${soSao >= star} ? 'filled-star' : 'no-star'"><i class="fa fa-star"></i></li>
+                                                                        </th:block>
+                                                                    </th:block>
+                                                                </th:block>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <h4>
+                                                        <a
+                                                            class="product_name"
+                                                            th:href="@{|/user/product-details?productId=${product.get('sanPham').get('sanPhamId')}&productName=${product.get('sanPham').get('tenSanPham').asText()}|}"
+                                                            th:text="${product.get('sanPham').get('tenSanPham').asText()}"
+                                                        ></a>
+                                                    </h4>
+                                                    <div class="price-box">
+                                                        <span class="new-price new-price-2" th:if="${#strings.contains(product.get('giamGia').asText(), 'true')}">
+                                                            <span th:with="giamGia = ${product.get('phanTramGiamGia').asInt()}">
+                                                                <span th:if="${giamGia > 0}">
+                                                                    <span th:text="${#numbers.formatDecimal(product.get('tongGia').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                        <span class="new-price" th:if="${#strings.contains(product.get('giamGia').asText(), 'false')}">
+                                                            <span th:text="${#numbers.formatDecimal(product.get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                        </span>
+                                                        <span class="old-price" th:if="${#strings.contains(product.get('giamGia').asText(), 'true')}">
+                                                            <span th:with="giamGia = ${product.get('phanTramGiamGia').asInt()}">
+                                                                <span th:if="${giamGia > 0}">
+                                                                    <span th:text="${#numbers.formatDecimal(product.get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                        <span class="discount-percentage" th:if="${product.get('phanTramGiamGia').asInt()} > 0">
+                                                            <span th:text="'-' + ${product.get('phanTramGiamGia').asInt()} + '%'"></span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="add-actions">
+                                                    <ul class="add-actions-link">
+                                                        <li
+                                                            class="add-cart active"
+                                                            th:data-color-id="@{|${product.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('mauSacId')}|}"
+                                                            th:attr="ng-click='addToCart(' + ${product.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('mauSacId')} + ', 1);'"
+                                                        >
+                                                            <a>Thêm vào giỏ</a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="product-area li-laptop-product pb-45" th:if="${not #lists.isEmpty(dienThoai)}">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="li-section-title">
+                                <h2>
+                                    <span>Điện thoại</span>
+                                </h2>
+                                <ul class="li-sub-category-list">
+                                    <li><a href="http://localhost:8080/user/shop-list?nhomSanPhamId=1">Xem tất cả</a></li>
+                                </ul>
+                            </div>
+                            <div class="row">
+                                <div class="product-active owl-carousel">
+                                    <div class="col-lg-12" th:each="sp : ${dienThoai}">
+                                        <div class="single-product-wrap">
+                                            <div class="product-image">
+                                                <a th:href="@{|/user/product-details?productId=${sp.get('sanPham').get('sanPhamId')}&productName=${sp.get('sanPham').get('tenSanPham').asText()}|}">
+                                                    <img th:src="${sp.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('duongDanAnh').asText()}" alt="Li's Product Image" />
+                                                </a>
+                                                <span class="sticker">New</span>
+                                            </div>
+                                            <div class="product_desc">
+                                                <div class="product_desc_info">
+                                                    <div class="product-review">
+                                                        <h5 class="manufacturer">
+                                                            <a href="http://localhost:8080/user/shop-list?nhomSanPhamId=1" th:text="${sp.get('sanPham').get('danhMucSanPham').get('tenDanhMucSanPham').asText()} + ' Brand'"></a>
+                                                        </h5>
+                                                        <div class="rating-box">
+                                                            <ul class="rating">
+                                                                <th:block th:with="totalStars=${#numbers.sequence(1, 5)}">
+                                                                    <th:block th:with="soSao=${#strings.contains(sp.get('soSao'), 'null') ? 0 : sp.get('soSao').asInt()}">
+                                                                        <th:block th:each="star : ${totalStars}">
+                                                                            <li th:class="${soSao >= star} ? 'filled-star' : 'no-star'"><i class="fa fa-star"></i></li>
+                                                                        </th:block>
+                                                                    </th:block>
+                                                                </th:block>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <h4>
+                                                        <a
+                                                            class="product_name"
+                                                            th:href="@{|/user/product-details?productId=${sp.get('sanPham').get('sanPhamId')}&productName=${sp.get('sanPham').get('tenSanPham').asText()}|}"
+                                                            th:text="${sp.get('sanPham').get('tenSanPham').asText()}"
+                                                        ></a>
+                                                    </h4>
+                                                    <div class="price-box">
+                                                        <span class="new-price new-price-2" th:if="${#strings.contains(sp.get('giamGia').asText(), 'true')}">
+                                                            <span th:with="giamGia = ${sp.get('phanTramGiamGia').asInt()}">
+                                                                <span th:if="${giamGia > 0}">
+                                                                    <span th:text="${#numbers.formatDecimal(sp.get('tongGia').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                        <span class="new-price" th:if="${#strings.contains(sp.get('giamGia').asText(), 'false')}">
+                                                            <span th:text="${#numbers.formatDecimal(sp.get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                        </span>
+                                                        <span class="old-price" th:if="${#strings.contains(sp.get('giamGia').asText(), 'true')}">
+                                                            <span th:with="giamGia = ${sp.get('phanTramGiamGia').asInt()}">
+                                                                <span th:if="${giamGia > 0}">
+                                                                    <span th:text="${#numbers.formatDecimal(sp.get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                        <span class="discount-percentage" th:if="${sp.get('phanTramGiamGia').asInt()} > 0">
+                                                            <span th:text="'-' + ${sp.get('phanTramGiamGia').asInt()} + '%'"></span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="add-actions">
+                                                    <ul class="add-actions-link">
+                                                        <li class="add-cart active" th:data-color-id="@{|${sp.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('mauSacId')}|}"
+                                                        th:attr="ng-click='addToCart(' + ${sp.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('mauSacId')} + ', 1);'"
+                                                        ><a>Thêm vào giỏ</a></li>
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </body>
+</html>

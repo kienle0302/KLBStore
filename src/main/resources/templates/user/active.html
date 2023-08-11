@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+
+<head>
+    <title>KLB Store</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="breadcrumb-area">
+            <div class="container">
+                <div class="breadcrumb-content">
+                    <ul>
+                        <li><a href="/user/index">Trang chủ</a></li>
+                        <li><a href="/user/login-register">Đăng nhập</a></li>
+                        <li class="active">Kích hoạt tài khoản</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-section mb-60">
+            <div class="container">
+                <div class="row justify-content-md-center">
+                    <div class="col-md-6">
+                        <form th:action="@{/user/active/__${email}__}" method="post">
+                            <div class="login-form">
+                                <h4 class="login-title">Kích hoạt tài khoản</h4>
+                                <div class="row">
+                                    <input hidden th:name="email">
+                                    <div class="col-md-12 mb-20">
+                                        <label>Mã xác nhận</label>
+                                        <input class="mb-0" type="text" th:name="otp"
+                                            placeholder="Nhập mật khẩu xác nhận">
+                                    </div>
+                                    <div class="col-12">
+                                        <div th:if="${message}" class="alert alert-warning alert-dismissible fade show"
+                                            role="alert">
+                                            <span th:text="${message}"></span><a href="/user/login-register"
+                                                th:text="${error}"></a>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <button class="btn btn-primary" type="submit">Xác nhận</button>
+                                        <span th:txt="${message}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

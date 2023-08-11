@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}">
+<head>
+  <title>KLB Store</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+			<div class="pd-ltr-20">
+				<div class="card-box pd-20 height-100-p mb-30">
+					<div class="row align-items-center">
+						<div class="col-md-4">
+							<img src="/assets/admin/vendors/images/banner-img.png" alt="" />
+						</div>
+						<div class="col-md-8">
+							<h4 class="font-20 weight-500 mb-10 text-capitalize">
+								Chào mừng trở lại
+								<div class="weight-600 font-30 text-blue">Bảo Dương</div>
+							</h4>
+							<p class="font-18 max-width-600">
+								“Death is like the wind – always by my side.”
+							</p>
+						</div>
+					</div>
+				</div>
+				<!-- dashboard.js -->
+				<div class="row">
+					<div class="col mb-30">
+						<div class="card-box height-100-p pd-20">
+							<h2 class="h4 mb-20">Tồn kho</h2>
+							<div id="tonKho"></div>
+						</div>
+					</div>
+					
+				</div>
+				
+				<div class="footer-wrap pd-20 mb-20 card-box">
+					KLB - Công ty trách nhiệm hữu hạng 3 thành viên
+					<a href="https://github.com/chibao2k3" target="_blank">ChiBao2k3</a>
+				</div>
+			</div>
+		</div>
+		<!--chart và dashboard-->
+		<script src="/assets/admin/src/plugins/apexcharts/apexcharts.min.js"></script> 
+		<script src="/assets/admin/vendors/scripts/dashboard.js"></script>
+		
+		
+
+    <script th:inline="javascript">
+
+      // var fruits = /*[[${fruits}]]*/[];
+      var soLuong = [];
+      var ten = [];
+      var tongSL = [];
+      
+      var tongSoLuong = 0;
+      var daban = [];
+      // Lặp qua danh sách các phần tử trong JavaScript
+      /*[# th:each="fruit : ${fruits}"]*/
+      var tenDanhMuc = /*[[${fruit.tenDanhMuc}]]*/ '';
+      ten.push(tenDanhMuc);
+
+      var sl = /*[[${fruit.soLuong}]]*/ '';
+      soLuong.push(sl);
+      
+      tongSoLuong = tongSoLuong + /*[[${fruit.soLuong}]]*/ '';
+
+
+      /*[/]*/
+      
+      for (let index = 0; index < soLuong.length; index++) {
+        const element = tongSoLuong - soLuong[index];
+        tongSL.push(element);
+      }
+
+
+      // for (let index = 0; index < soLuong.length; index++) {
+      //   tongSL.push(tongSoLuong);
+      // }
+
+      var tonkho = {
+        series: [{
+          name: 'Tồn Kho',
+          data: soLuong
+        }, {
+          name: 'Đã Bán',
+          data: tongSL
+        }],
+        chart: {
+          type: 'bar',
+          height: 350
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            endingShape: 'rounded'
+          },
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          show: true,
+          width: 2,
+          colors: ['transparent']
+        },
+        xaxis: {
+          categories: ten,
+        },
+
+        yaxis: {
+          title: {
+            text: '(Số Lượng)'
+          }
+        },
+        fill: {
+          opacity: 1
+        },
+        tooltip: {
+          y: {
+            formatter: function (val) {
+              return val + " Sản phẩm"
+            }
+          }
+        }
+      };
+
+      var tonKho = new ApexCharts(document.querySelector("#tonKho"), tonkho);
+      tonKho.render();
+
+
+    </script>
+    </div>
+</body>
+</html>

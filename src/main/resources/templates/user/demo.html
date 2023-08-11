@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chọn Tỉnh/Quận/Xã</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <div ng-app="shippingApp" ng-controller="ShippingController">
+            <label>Tỉnh/Thành phố gửi:</label>
+            <select ng-model="selectedProvinceFrom" ng-options="province as province.ProvinceName for province in provincesFrom" ng-change="getDistrictsFrom()">
+                <option value="">Chọn tỉnh/thành phố gửi</option>
+            </select>
+
+            <label>Quận/Huyện gửi:</label>
+            <select ng-model="selectedDistrictFrom" ng-options="district as district.DistrictName for district in districtsFrom" ng-change="getWardsFrom()">
+                <option value="">Chọn quận/huyện gửi</option>
+            </select>
+
+            <label>Xã/Phường gửi:</label>
+            <select ng-model="selectedWardFrom" ng-options="ward as ward.NameExtension[0] for ward in wardsFrom" ng-change="calculateShippingFee();">
+                <option value="">Chọn xã/phường gửi</option>
+            </select>
+
+            <br />
+
+            <label>Tỉnh/Thành phố nhận:</label>
+            <select ng-model="selectedProvinceTo" ng-options="province as province.ProvinceName for province in provincesTo" ng-change="getDistrictsTo();">
+                <option value="">Chọn tỉnh/thành phố nhận</option>
+            </select>
+
+            <label>Quận/Huyện nhận:</label>
+            <select ng-model="selectedDistrictTo" ng-options="district as district.DistrictName for district in districtsTo" ng-change="getWardsTo()">
+                <option value="">Chọn quận/huyện nhận</option>
+            </select>
+
+            <label>Xã/Phường nhận:</label>
+            <select ng-model="selectedWardTo" ng-options="ward as ward.NameExtension[0] for ward in wardsTo" ng-change="calculateShippingFee();">
+                <option value="">Chọn xã/phường nhận</option>
+            </select>
+
+            <p ng-if="shippingFee === 'error'">Chúng tôi vẫn chưa hỗ trợ giao hàng ở khu vực của bạn, vui lòng đến cửa hàng nhận nhé</p>
+            <p ng-if="shippingFee !== 'error'">Phí vận chuyển: {{ shippingFee | number:0 }} ₫</p>
+            <p ng-if="shippingFee !== 'error'">Ngày giao hàng dự kiến: {{ dateDelivery }}</p>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+        <script>
+            var timestamp = 1691711999;
+            var deliveryDate = new Date(timestamp * 1000);
+            console.log(deliveryDate);
+
+            var app = angular.module("shippingApp", []);
+
+            app.factory("ShippingService", [
+                "$http",
+                function ($http) {
+                    var baseUrl = "https://online-gateway.ghn.vn/shiip/public-api";
+                    var token = "4525b920-35a7-11ee-a59f-a260851ba65c"; // Thay thế YOUR_API_TOKEN bằng token thực tế của bạn
+
+                    return {
+                        // Hàm gọi API lấy danh sách tỉnh
+                        getProvinces: function () {
+                            var config = {
+                                headers: { token: token },
+                            };
+                            return $http.get(baseUrl + "/master-data/province", config);
+                        },
+                        // Hàm gọi API lấy danh sách quận/huyện dựa trên ID tỉnh đã chọn
+                        getDistricts: function (provinceId) {
+                            var config = {
+                                headers: { token: token },
+                            };
+                            var data = { province_id: provinceId };
+                            return $http.post(baseUrl + "/master-data/district", data, config);
+                        },
+                        // Hàm gọi API lấy danh sách xã dựa trên ID quận/huyện đã chọn
+                        getWards: function (districtId) {
+                            var config = {
+                                headers: { token: token },
+                            };
+                            var data = { district_id: districtId };
+                            return $http.post(baseUrl + "/master-data/ward", data, config);
+                        },
+                        // Hàm gọi API tính giá cước vận chuyển
+                        getShippingFee: function (data) {
+                            var config = {
+                                headers: { token: token },
+                            };
+                            return $http.post(baseUrl + "/v2/shipping-order/fee", data, config);
+                        },
+                        getDateDelivery: function (data) {
+                            var config = {
+                                headers: { token: token },
+                            };
+                            return $http.post(baseUrl + "/v2/shipping-order/leadtime", data, config);
+                        },
+                    };
+                },
+            ]);
+
+            app.controller("ShippingController", [
+                "$scope",
+                "ShippingService",
+                function ($scope, ShippingService) {
+                    $scope.provincesFrom = [];
+                    $scope.districtsFrom = [];
+                    $scope.wardsFrom = [];
+                    $scope.selectedProvinceFrom = null;
+                    $scope.selectedDistrictFrom = null;
+                    $scope.selectedWardFrom = null;
+
+                    $scope.provincesTo = [];
+                    $scope.districtsTo = [];
+                    $scope.wardsTo = [];
+                    $scope.selectedProvinceTo = null;
+                    $scope.selectedDistrictTo = null;
+                    $scope.selectedWardTo = null;
+
+                    $scope.shippingFee = 0;
+
+                    $scope.dateDelivery = "Không xác định";
+
+                    // Lấy danh sách tỉnh khi load trang
+                    ShippingService.getProvinces().then(function (response) {
+                        $scope.provincesFrom = response.data.data;
+                        $scope.provincesTo = response.data.data;
+                    });
+
+                    // Lấy danh sách quận/huyện gửi dựa trên tỉnh đã chọn
+                    $scope.getDistrictsFrom = function () {
+                        if ($scope.selectedProvinceFrom) {
+                            var selectedProvinceId = $scope.selectedProvinceFrom.ProvinceID;
+                            ShippingService.getDistricts(selectedProvinceId).then(function (response) {
+                                $scope.districtsFrom = response.data.data;
+                                $scope.selectedDistrictFrom = null;
+                                $scope.selectedWardFrom = null;
+                                $scope.shippingFee = 0; // Đặt lại phí vận chuyển thành 0 khi thay đổi tỉnh/thành phố gửi
+                            });
+                        } else {
+                            $scope.districtsFrom = [];
+                            $scope.wardsFrom = [];
+                            $scope.selectedDistrictFrom = null;
+                            $scope.selectedWardFrom = null;
+                            $scope.shippingFee = 0; // Đặt lại phí vận chuyển thành 0 khi thay đổi tỉnh/thành phố gửi
+                        }
+                    };
+
+                    // Lấy danh sách xã gửi dựa trên quận/huyện đã chọn
+                    $scope.getWardsFrom = function () {
+                        if ($scope.selectedDistrictFrom) {
+                            var selectedDistrictId = $scope.selectedDistrictFrom.DistrictID;
+                            ShippingService.getWards(selectedDistrictId).then(function (response) {
+                                $scope.wardsFrom = response.data.data;
+                                $scope.selectedWardFrom = null;
+                                $scope.shippingFee = 0; // Đặt lại phí vận chuyển thành 0 khi thay đổi quận/huyện gửi
+                            });
+                        } else {
+                            $scope.wardsFrom = [];
+                            $scope.selectedWardFrom = null;
+                            $scope.shippingFee = 0; // Đặt lại phí vận chuyển thành 0 khi thay đổi quận/huyện gửi
+                        }
+                    };
+
+                    // Lấy danh sách quận/huyện nhận dựa trên tỉnh đã chọn
+                    $scope.getDistrictsTo = function () {
+                        if ($scope.selectedProvinceTo) {
+                            var selectedProvinceId = $scope.selectedProvinceTo.ProvinceID;
+                            ShippingService.getDistricts(selectedProvinceId).then(function (response) {
+                                $scope.districtsTo = response.data.data;
+                                $scope.selectedDistrictTo = null;
+                                $scope.selectedWardTo = null;
+                                $scope.shippingFee = 0; // Đặt lại phí vận chuyển thành 0 khi thay đổi tỉnh/thành phố nhận
+                            });
+                        } else {
+                            $scope.districtsTo = [];
+                            $scope.wardsTo = [];
+                            $scope.selectedDistrictTo = null;
+                            $scope.selectedWardTo = null;
+                            $scope.shippingFee = 0; // Đặt lại phí vận chuyển thành 0 khi thay đổi tỉnh/thành phố nhận
+                        }
+                    };
+
+                    // Lấy danh sách xã nhận dựa trên quận/huyện đã chọn
+                    $scope.getWardsTo = function () {
+                        if ($scope.selectedDistrictTo) {
+                            var selectedDistrictId = $scope.selectedDistrictTo.DistrictID;
+                            ShippingService.getWards(selectedDistrictId).then(function (response) {
+                                $scope.wardsTo = response.data.data;
+                                $scope.selectedWardTo = null;
+                                $scope.shippingFee = 0; // Đặt lại phí vận chuyển thành 0 khi thay đổi quận/huyện nhận
+                            });
+                        } else {
+                            $scope.wardsTo = [];
+                            $scope.selectedWardTo = null;
+                            $scope.shippingFee = 0; // Đặt lại phí vận chuyển thành 0 khi thay đổi quận/huyện nhận
+                        }
+                    };
+
+                    // Tính phí vận chuyển khi thay đổi thông tin vận chuyển
+                    $scope.calculateShippingFee = function () {
+                        if ($scope.selectedDistrictFrom && $scope.selectedWardFrom && $scope.selectedDistrictTo && $scope.selectedWardTo) {
+                            var data = {
+                                service_id: 53321,
+                                insurance_value: 500000,
+                                coupon: null,
+                                from_district_id: $scope.selectedDistrictFrom.DistrictID,
+                                to_district_id: $scope.selectedDistrictTo.DistrictID,
+                                to_ward_code: $scope.selectedWardTo.WardCode,
+                                height: 15,
+                                length: 15,
+                                weight: 1000,
+                                width: 15,
+                            };
+                            console.log(data);
+
+                            ShippingService.getShippingFee(data)
+                                .then(function (response) {
+                                    $scope.shippingFee = response.data.data.total;
+                                    $scope.calculateDateDelivery();
+                                })
+                                .catch(function (error) {
+                                    $scope.shippingFee = "error";
+                                });
+                        } else {
+                            $scope.shippingFee = 0; // Nếu chưa chọn đầy đủ thông tin địa chỉ thì đặt phí vận chuyển thành 0
+                        }
+                    };
+                    $scope.calculateShippingFee = function () {
+                        if ($scope.selectedDistrictFrom && $scope.selectedWardFrom && $scope.selectedDistrictTo && $scope.selectedWardTo) {
+                            var data = {
+                                service_id: 53321,
+                                insurance_value: 500000,
+                                coupon: null,
+                                from_district_id: $scope.selectedDistrictFrom.DistrictID,
+                                to_district_id: $scope.selectedDistrictTo.DistrictID,
+                                to_ward_code: $scope.selectedWardTo.WardCode,
+                                height: 15,
+                                length: 15,
+                                weight: 1000,
+                                width: 15,
+                            };
+                            console.log(data);
+
+                            ShippingService.getShippingFee(data)
+                                .then(function (response) {
+                                    $scope.shippingFee = response.data.data.total;
+
+                                    // Chỉ gọi hàm calculateDateDelivery() khi đủ thông tin địa chỉ được chọn
+                                    if ($scope.selectedDistrictFrom && $scope.selectedWardFrom && $scope.selectedDistrictTo && $scope.selectedWardTo) {
+                                        $scope.calculateDateDelivery();
+                                    }
+                                })
+                                .catch(function (error) {
+                                    $scope.shippingFee = "error";
+                                });
+                        } else {
+                            $scope.shippingFee = 0; // Nếu chưa chọn đầy đủ thông tin địa chỉ thì đặt phí vận chuyển thành 0
+                        }
+                    };
+                    $scope.calculateDateDelivery = function () {
+                        if ($scope.selectedDistrictFrom && $scope.selectedWardFrom && $scope.selectedDistrictTo && $scope.selectedWardTo) {
+                            var data = {
+                                from_district_id: $scope.selectedDistrictFrom.DistrictID,
+                                from_ward_code: $scope.selectedWardFrom.WardCode,
+                                to_district_id: $scope.selectedDistrictTo.DistrictID,
+                                to_ward_code: $scope.selectedWardTo.WardCode,
+                                service_id: 53320,
+                            };
+                            console.log(data);
+                            ShippingService.getDateDelivery(data)
+                                .then(function (response) {
+                                    var timestamp = response.data.data.leadtime;
+                                    var deliveryDate = new Date(timestamp * 1000);
+                                    var day = deliveryDate.getDate();
+                                    var month = deliveryDate.getMonth() + 1;
+                                    var year = deliveryDate.getFullYear();
+                                    $scope.dateDelivery = day + "/" + month + "/" + year;
+                                })
+                                .catch(function (error) {
+                                    $scope.dateDelivery = "Không xác định"; // Nếu có lỗi thì hiển thị 'Không xác định'
+                                });
+                        } else {
+                            $scope.dateDelivery = "Không xác định"; // Nếu chưa chọn đầy đủ thông tin địa chỉ thì hiển thị 'Không xác định'
+                        }
+                    };
+                },
+            ]);
+        </script>
+    </body>
+</html>

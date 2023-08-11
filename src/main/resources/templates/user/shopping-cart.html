@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+    <head>
+        <title>KLB Store</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="breadcrumb-area">
+                <div class="container">
+                    <div class="breadcrumb-content">
+                        <ul>
+                            <li><a href="/user/index">Home</a></li>
+                            <li class="active">Shopping Cart</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="Shopping-cart-area pt-60 pb-60">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <h4 ng-if="show" class="text-center">Chưa có sản phẩm nào trong giỏ hàng của bạn</h4>
+                            <form ng-if="!show" action="#">
+                                <div class="table-content table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="li-product-remove">xóa</th>
+                                                <th class="li-product-thumbnail">hình ảnh</th>
+                                                <th class="cart-product-name">Sản phẩm</th>
+                                                <th class="li-product-price">Đơn giá</th>
+                                                <th class="li-product-quantity">Số lượng</th>
+                                                <th class="li-product-quantity">Màu sắc</th>
+                                                <th class="li-product-subtotal">Tổng cộng</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="item : ${allCart.danhSachSanPhamTrongGioHang}" th:data-product-id="${item.chiTietGioHang.mauSac.mauSacId}">
+                                                <td class="li-product-remove">
+                                                    <a th:attr="ng-click='removeItem(' + ${item.chiTietGioHang.mauSac.mauSacId} + ');'"><i class="fa fa-times"></i></a>
+                                                </td>
+                                                <td class="li-product-thumbnail">
+                                                    <a><img th:src="${item.chiTietGioHang.mauSac.duongDanAnh}" alt="Hình ảnh sản phẩm" /></a>
+                                                </td>
+                                                <td class="li-product-name"><a th:href="@{|/user/product-details?productId=${item.sanPhamId}&productName=${item.tenSanPham}|}" th:text="${item.tenSanPham}"></a></td>
+                                                <td class="li-product-price"><span class="amount" th:text="${#numbers.formatDecimal(item.giaBan, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span></td>
+                                                <td class="quantity">
+                                                    <div class="cart-plus-minus">
+                                                        <input class="cart-plus-minus-box" th:attr="ng-model='inputQuantities[' + ${item.chiTietGioHang.mauSac.mauSacId} + ']', ng-init='inputQuantities[' + ${item.chiTietGioHang.mauSac.mauSacId} + ']' + '=' + ${item.chiTietGioHang.soLuong}, ng-change='updateCart(' + ${item.chiTietGioHang.mauSac.mauSacId} + ')'"
+                                                        />
+                                                        <div class="dec qtybutton" th:attr="ng-click='decreaseQuantity(' + ${item.chiTietGioHang.mauSac.mauSacId} + ')'"><i class="fa fa-angle-down"></i></div>
+                                                        <div class="inc qtybutton" th:attr="ng-click='increaseQuantity(' + ${item.chiTietGioHang.mauSac.mauSacId} + ')'"><i class="fa fa-angle-up"></i></div>
+                                                    </div>
+                                                </td>
+                                                <td class="li-product-color" th:text="${item.chiTietGioHang.mauSac.tenMauSac}"></td>
+                                                <td class="product-subtotal"><span class="amount" th:product-subtotal=${item.chiTietGioHang.mauSac.mauSacId} th:text="${#numbers.formatDecimal(item.tongGia, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="coupon-all" style="display: none;">
+                                            <div class="coupon">
+                                                <input id="coupon_code" class="input-text" name="coupon_code" value="" placeholder="Mã giảm giá" type="text" />
+                                                <input class="button" name="apply_coupon" value="Áp dụng mã giảm giá" type="submit" />
+                                            </div>
+                                            <div class="coupon2">
+                                                <input class="button" name="update_cart" value="Cập nhật giỏ hàng" type="submit" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5 ml-auto">
+                                        <div class="cart-page-total">
+                                            <h2>Tổng cộng giỏ hàng</h2>
+                                            <ul>
+                                                <li>Tổng cộng <span class="tongTien" th:text="${#numbers.formatDecimal(allCart.tongTien, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span></li>
+                                            </ul>
+                                            <a href="/user/checkout">Tiến hành thanh toán</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

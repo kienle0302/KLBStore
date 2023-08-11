@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}">
+<head>
+  <title>KLB Store</title>
+  <style>
+    .hidden-pass{
+        content: "*";
+    }
+  </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+            <div class="pd-ltr-20 xs-pd-20-10">
+                <div class="min-height-200px">
+                    <div class="page-header">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="title">
+                                    <h4>Quản Lý Người Dùng</h4>
+                                </div>
+                                <nav aria-label="breadcrumb" role="navigation">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="index.html">Trang Chủ</a>
+                                        </li>
+                                        <li class="breadcrumb-item active" aria-current="page">
+                                            Quản Lý Người Dùng
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <!-- Default Basic Forms Start -->
+                    <div class="pd-20 card-box mb-30">
+                        <div class="clearfix">
+                            <div class="pull-left">
+                                <h4 class="text-blue h4">Quản Lý Người Dùng</h4>
+                                <!-- <p class="mb-30">All bootstrap element classies</p> -->
+                            </div>
+    
+                        </div>
+                        <form action="#" th:action="@{/admin/nguoidung/save}" th:object="${items}" method="post">
+                            <div class="form-group row">
+                                <!-- <label class="col-sm-12 col-md-2 col-form-label">Mã Người Dùng</label> -->
+                                <div class="col-sm-12 col-md-10">
+                                    <input th:field="*{nguoiDungId}" class="form-control" type="hidden" placeholder="" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Tên Đăng Nhập</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <input th:field="*{tenDangNhap}" class="form-control" type="text" placeholder="" />
+                                    <span class="text-danger" th:if="${#fields.hasErrors('tenDangNhap')}" th:errors="*{tenDangNhap}"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Mật Khẩu</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <div class="input-group" style="margin-bottom: 0;">
+                                        <input th:field="*{matKhau}" class="form-control" type="text" placeholder="*******" />
+                                        <!-- <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary js-hidden-text" onclick="hiddenPass()" type="button">Ẩn</button>
+                                          </div> -->
+                                    </div>
+                                    <span class="text-danger" th:if="${#fields.hasErrors('matKhau')}" th:errors="*{matKhau}"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Họ Và Tên</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <input th:field="*{hoTen}" class="form-control" type="text" placeholder="" />
+                                    <span class="text-danger" th:if="${#fields.hasErrors('hoTen')}" th:errors="*{hoTen}"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Email</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <input th:field="*{email}" class="form-control" value="VD: annv@gmail.com" type="email" />
+                                    <span class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                                </div>
+                            </div>
+    
+                            <div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Số Điện Thoại</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <input th:field="*{sdt}" class="form-control" value="XX-XXXX-XXXX" type="number" />
+                                    <span class="text-danger" th:if="${#fields.hasErrors('sdt')}" th:errors="*{sdt}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label for="example-datetime-local-input" class="col-sm-12 col-md-2 col-form-label">Ngày
+                                    Sinh</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <input th:field="*{ngaySinh}" class="form-control" placeholder="dd-MM-yyyy"
+                                        type="date" />
+                                        <span class="text-danger" th:if="${#fields.hasErrors('ngaySinh')}" th:errors="*{ngaySinh}"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Giới Tính</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <select th:field="*{gioiTinh}" class="custom-select col-12">
+                                        <option th:each="gioitinh : ${genders}" th:value="${gioitinh.key}" th:text="${gioitinh.value}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Địa Chỉ</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <textarea th:field="*{diaChi}" class="form-control" placeholder="Xã, Phường, Quận, Huyện, Tỉnh"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="example-datetime-local-input" class="col-sm-12 col-md-2 col-form-label">Ngày
+                                    Đăng Ký</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <input th:field="*{ngayDangKy}" class="form-control" placeholder="dd-MM-yyyy"
+                                        type="datetime" readonly/>
+                                        <!-- <span class="text-danger" th:if="${#fields.hasErrors('ngayDangKy')}" th:errors="*{ngayDangKy}"></span> -->
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Quyền</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <select th:field="*{quyenDangNhap}" class="custom-select col-12">
+                                        <option value="false">Người Dùng</option>
+                                        <option value="true">Quản Trị</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-12 col-md-2 col-form-label">Trạng Thái Khóa</label>
+                                <div class="col-sm-12 col-md-10">
+                                    <select th:field="*{trangThaiKhoa}" class="custom-select col-12">
+                                        <option value="false">Không Khóa</option>
+                                        <option value="true">Khóa</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col align-self-end">
+                                    <button class="btn btn-outline-success">Lưu</button>
+                                </div>
+                            </div>
+                        </form>
+    
+                    </div>
+    
+                    <!-- Default Basic Forms End -->
+    
+    
+                    <div class="footer-wrap pd-20 mb-20 card-box">
+                        Web Design by
+                        <a href="#" target="_blank">KLB</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        
+    </script>
+</body>
+</html>

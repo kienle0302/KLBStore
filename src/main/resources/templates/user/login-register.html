@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+    <head>
+        <title>KLB Store</title>
+    </head>
+
+    <body>
+        <div layout:fragment="content">
+            <div class="breadcrumb-area">
+                <div class="container">
+                    <div class="breadcrumb-content">
+                        <ul>
+                            <li><a href="/user/index">Trang chủ</a></li>
+                            <li class="active">Đăng nhập và đăng ký</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-section mb-60">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12 col-xs-12 col-lg-6 mb-30">
+                            <form th:action="@{/user/login-register}" th:object="${login}" method="post">
+                                <div class="login-form">
+                                    <h4 class="login-title">Đăng nhập</h4>
+                                    <div class="row">
+                                        <div class="col-md-12 col-12 mb-20">
+                                            <label>Số điện thoại</label>
+                                            <input class="mb-0" type="text" th:field="*{sdt}" placeholder="Nhập số của bạn" />
+                                            <span class="text-danger error" th:if="${#fields.hasErrors('sdt')}" th:errors="*{sdt}"></span>
+                                        </div>
+                                        <div class="col-12 mb-20">
+                                            <label>Mật khẩu</label>
+                                            <input class="mb-0" type="password" th:field="*{matKhau}" placeholder="Mật khẩu" />
+                                            <span class="text-danger error" th:if="${#fields.hasErrors('matKhau')}" th:errors="*{matKhau}"></span>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="check-box d-inline-block ml-0 ml-md-2 mt-10">
+                                                <input type="checkbox" id="remember_me" th:name="rememberMe" th:value="true" checked />
+                                                <label for="remember_me">Ghi nhớ</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mt-10 mb-20 text-left text-md-right">
+                                            <a th:href="@{/user/forgot-password}">Quên mật khẩu?</a>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div th:if="${message}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                                                <span th:text="${message}"></span><a th:href="@{/user/unlock-account?sdt=__${login.sdt}__}" th:text="${link}"></a>
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <button class="register-button mt-0">Đăng nhập</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-6 col-xs-12">
+                            <form th:object="${registry}" th:action="@{/user/login-register/registry}" method="post">
+                                <div class="login-form">
+                                    <h4 class="login-title">Đăng ký</h4>
+                                    <div class="row">
+                                        <div class="col-md-6 col-12 mb-20">
+                                            <label>Tên đăng nhập</label>
+                                            <input class="mb-0" type="text" th:field="*{tenDangNhap}" placeholder="Tên đăng nhập" />
+                                            <span class="text-danger error" th:if="${#fields.hasErrors('tenDangNhap')}" th:errors="*{tenDangNhap}"></span>
+                                        </div>
+                                        <div class="col-md-6 col-12 mb-20">
+                                            <label>Họ tên</label>
+                                            <input class="mb-0" type="text" th:field="*{hoTen}" placeholder="Họ tên" />
+                                            <span class="text-danger error" th:if="${#fields.hasErrors('hoTen')}" th:errors="*{hoTen}"></span>
+                                        </div>
+                                        <div class="col-md-12 mb-20">
+                                            <label>Email</label>
+                                            <input class="mb-0" type="text" th:field="*{email}" placeholder="Địa chỉ Email" />
+                                            <span class="text-danger error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                                        </div>
+                                        <div class="col-md-12 mb-20">
+                                            <label>Số điện thoại</label>
+                                            <input class="mb-0" type="text" th:field="*{sdt}" placeholder="Số điện thoại" />
+                                            <span class="text-danger error" th:if="${#fields.hasErrors('sdt')}" th:errors="*{sdt}"></span>
+                                        </div>
+                                        <div class="col-md-6 mb-20">
+                                            <label>Mật khẩu</label>
+                                            <input class="mb-0" type="password" th:field="*{matKhau}" placeholder="Mật khẩu" />
+                                            <span class="text-danger error" th:if="${#fields.hasErrors('matKhau')}" th:errors="*{matKhau}"></span>
+                                        </div>
+
+                                        <div class="col-md-6 mb-20">
+                                            <label>Xác nhận mật khẩu</label>
+                                            <input class="mb-0" type="password" th:name="matKhauXN" placeholder="Xác nhận mật khẩu" />
+                                            <span class="text-danger error" th:if="${errorMessage}"></span>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div th:if="${errorMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                                                <span th:text="${errorMessage}"></span>
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <button class="register-button mt-0" type="submit">Đăng ký</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

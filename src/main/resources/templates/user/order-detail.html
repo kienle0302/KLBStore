@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+    <head>
+        <title>KLB Store</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="breadcrumb-area">
+                <div class="container">
+                    <div class="breadcrumb-content">
+                        <ul>
+                            <li><a href="/user/index">Trang chủ</a></li>
+                            <li class="active">Wishlist</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wishlist-area pt-60 pb-60">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <form action="#">
+                                <div class="table-content table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="li-product-thumbnail">Hình ảnh</th>
+                                                <th class="cart-product-name">Sản phẩm</th>
+                                                <th class="li-product-quantity">Số lượng</th>
+                                                <th class="li-product-price">Giá</th>
+                                                <th class="li-product-color">Màu sắc</th>
+                                                <th class="li-product-discount">Giảm giá</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="ctdh, iterStat : ${chiTietDonHangLists}">
+                                                <td class="li-product-thumbnail">
+                                                    <a th:href="@{'/user/product-details?productId=' + ${ctdh.sanPham.sanPhamId} + '&productName=' + ${ctdh.sanPham.tenSanPham}}"><img th:src="${ctdh.mauSac.duongDanAnh}" alt="" /></a>
+                                                </td>
+                                                <td class="li-product-name" th:text="${ctdh.sanPham.tenSanPham}"></td>
+                                                <td class="li-product-price" th:text="${ctdh.soLuong}"></td>
+                                                <td class="li-product-quantity" th:text="${#numbers.formatDecimal(ctdh.giaBan, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></td>
+                                                <td class="li-product-color" th:text="${ctdh.mauSac.tenMauSac}"></td>
+                                                <td class="li-product-color" th:text="${ctdh.giamGia}"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

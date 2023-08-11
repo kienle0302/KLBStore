@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}">
+<head>
+  <title>KLB Store</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+            <div class="pd-ltr-20 xs-pd-20-10">
+                <div class="min-height-200px">
+                    <div class="page-header">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="title">
+                                    <h4>Quản Lý Đánh Giá</h4>
+                                </div>
+                                <nav aria-label="breadcrumb" role="navigation">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="index.html">Trang Chủ</a>
+                                        </li>
+                                        <li class="breadcrumb-item active" aria-current="page">
+                                            Quản Lý Đánh Giá
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            
+                        </div>
+                    </div>
+    
+                    <!-- Simple Datatable start -->
+                    <div class="card-box mb-30">
+                        <div class="pd-20">
+                            <!-- <h4 class="text-blue h4">Danh Sách Sản Phẩm</h4>
+                            <p class="mb-0">
+                                you can find more options
+                                <a class="text-primary" href="https://datatables.net/" target="_blank">Click Here</a>
+                            </p> -->
+                        </div>
+                        <div class="pb-20">
+                            
+                            <table class="data-table table stripe hover nowrap">
+                                <thead>
+                                    <tr>
+                                        <th class="table-plus datatable-nosort">Mã Đánh Giá</th>
+                                        <!-- <th>Mã Sản Phẩm</th> -->
+                                        <th>Mã Người Dùng</th>
+                                        <th>Tiêu Đề</th>
+                                        <th>Ngày Đánh Giá</th>
+                                        <th>Hiển Thị</th>
+                                        <th>Sao</th>
+                                        <th class="datatable-nosort">Thao Tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="danhGia : ${items}">
+                                        <td th:text="*{danhGia.danhGiaSanPhamId}" class="table-plus"></td>
+                                        <td th:text="*{danhGia.sanPham.sanPhamId}"></td>
+                                        <td th:text="*{danhGia.nguoiDung.nguoiDungId}"></td>
+                                        <td th:text="*{danhGia.tieuDe}"></td>
+                                        <td th:text="*{danhGia.ngayDanhGia}"></td>
+                                        <td th:text="*{danhGia.hienThi}"></td>
+                                        <td th:text="*{danhGia.sao}"></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle"
+                                                    href="#" role="button" data-toggle="dropdown">
+                                                    <i class="dw dw-more"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                                    
+                                                    <a class="dropdown-item" th:href="@{/admin/danhgia/delete/__${danhGia.danhGiaSanPhamId}__}"><i class="dw dw-delete-3"></i>
+                                                        Xóa</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+    
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </div>
+                    <!-- Simple Datatable End -->
+                    <div class="footer-wrap pd-20 mb-20 card-box">
+                        Web Design by
+                        <a href="#" target="_blank">KLB</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

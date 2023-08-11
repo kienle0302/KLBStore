@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}">
+<head>
+  <title>KLB Store</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+            <div class="pd-ltr-20 xs-pd-20-10">
+                <div class="min-height-200px">
+                    <div class="page-header">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="title">
+                                    <h4>Danh Sách Sản Phẩm</h4>
+                                </div>
+                                <nav aria-label="breadcrumb" role="navigation">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="index.html">Trang Chủ</a>
+                                        </li>
+                                        <li class="breadcrumb-item active" aria-current="page">
+                                            Danh Sách Sản Phẩm
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <!-- <div class="col-md-6 col-sm-12 text-right">
+                                <div class="dropdown">
+                                    <a class="btn btn-primary dropdown-toggle" href="#" role="button"
+                                        data-toggle="dropdown">
+                                        January 2018
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="#">Export List</a>
+                                        <a class="dropdown-item" href="#">Policies</a>
+                                        <a class="dropdown-item" href="#">View Assets</a>
+                                    </div>
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+    
+                    <!-- Simple Datatable start -->
+                    <div class="card-box mb-30">
+                        <div class="pd-20">
+                            <p class="mb-0">
+                                <a th:href="@{/admin/sanpham/edit}" class="btn btn-outline-success">Thêm Mới</a>
+                            </p>
+                        </div>
+                        <div class="pb-20">
+                            
+                            <table class="data-table table stripe hover nowrap">
+                                <thead>
+                                    <tr>
+                                        <th class="table-plus"><a href="/admin/sanpham?sortBy=sanPhamId">Mã Sản Phẩm</a></th>
+                                        <th><a href="/admin/sanpham?sortBy=tenSanPham">Tên Sản Phẩm</a></th>
+                                        <th><a href="/admin/sanpham?sortBy=giaBan">Giá Bán</a></th>
+                                        <th>Danh Mục</th>
+                                        <th>Xuất Xứ</th>
+                                        <th><a href="/admin/sanpham?sortBy=soLuotXem">Lượt Xem</a></th>
+                                        <!-- <th>Giảm Giá</th> -->
+                                        <th><a href="/admin/sanpham?sortBy=ngayTao">Ngày Tạo</a></th>
+                                        <!-- <th>CPU</th> -->
+                                        <th>Mô Tả</th>
+                                        <th>Còn Hàng</th>
+                                        <th>Nổi Bật</th>
+                                        <th>Hiển Thị</th>
+                                        <th class="datatable-nosort">Thao Tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="sanpham : ${items}">
+                                        <td th:text="${sanpham.sanPhamId}" class="table-plus"></td>
+                                        <td th:text="${sanpham.tenSanPham}"></td>
+                                        <td th:text="${#numbers.formatDecimal(sanpham.giaBan, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></td>
+                                        <td th:text="${sanpham.danhMucSanPham.tenDanhMucSanPham}"></td>
+                                        <td th:text="${sanpham.xuatSu}"></td>
+                                        <td th:text="${sanpham.soLuotXem}"></td>
+                                        <td th:text="${sanpham.ngayTao}"></td>
+                                        <td th:text="${sanpham.moTa}"></td>
+                                        <td th:utext="${sanpham.conHang} ? 'Còn Hàng' : 'Hết Hàng'"></td>
+                                        <td th:utext="${sanpham.noiBat} ? 'Nổi Bật' : 'Ẩn'"></td>
+                                        <td th:utext="${sanpham.hienThi} ? 'Hiển Thị' : 'Ẩn'"></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle"
+                                                    href="#" role="button" data-toggle="dropdown">
+                                                    <i class="dw dw-more"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                                    <a class="dropdown-item" th:href="@{/admin/sanpham/editCauHinh/__${sanpham.sanPhamId}__?nhomSanPhamId=__${sanpham.danhMucSanPham.nhomSanPham.nhomSanPhamId}__}"><i class="dw dw-edit2"></i> Thêm Cấu Hình
+                                                        </a>
+                                                    <a class="dropdown-item" th:href="@{/admin/sanpham/edit/__${sanpham.sanPhamId}__}"><i class="dw dw-edit2"></i> Chỉnh
+                                                        Sửa</a>
+                                                    <a class="dropdown-item" th:href="@{/admin/sanpham/delete/__${sanpham.sanPhamId}__}"><i class="dw dw-delete-3"></i>
+                                                        Xóa</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+    
+                                </tbody>
+                            </table>
+                            <div style="margin: 0px 4px;" class="row">
+                                <div class="col">
+                                    <b>Trang: <span th:text="${items.number + 1}"></span> / <span th:text="${items.totalPages}"></span></b>
+                                </div>
+                                <div class="col-3">
+                                    <div class="navbar">
+                                        <a th:href="@{/admin/sanpham?p=0}"><i class="bi bi-chevron-double-left"></i></a>
+                                        <span th:if="${curr}>0"><a th:href="@{/admin/sanpham?p=__${items.number-1}__}"><i class="bi bi-chevron-left"></i></a></span>
+                                        <span th:if="${curr} < ${numberOfpages} - 1"><a th:href="@{/admin/sanpham?p=__${items.number+1}__}"><i class="bi bi-chevron-right"></i></a></span>
+                                        <!-- <a href="" th:each="i : ${items.number + 1}" th:text="${i}"></a> -->
+                                        <span th:if="${curr} < ${numberOfpages} - 1"><a th:href="@{/admin/sanpham?p=__${items.totalPages-1}__}"><i class="bi bi-chevron-double-right"></i></a></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Simple Datatable End -->
+                    <div class="footer-wrap pd-20 mb-20 card-box">
+                        Web Design by
+                        <a href="#" target="_blank">KLB</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

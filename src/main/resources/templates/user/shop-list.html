@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+    <head>
+        <title>KLB Store</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="breadcrumb-area">
+                <div class="container">
+                    <div class="breadcrumb-content">
+                        <ul>
+                            <li><a href="/user/index">Trang chủ</a></li>
+                            <li class="active">Sản phẩm</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-wraper pt-60 pb-60">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 order-1 order-lg-2">
+                            <div class="single-banner shop-page-banner">
+                                <a>
+                                    <img
+                                        src="https://firebasestorage.googleapis.com/v0/b/fir-e2be5.appspot.com/o/user%2Fimages%2Fbg-banner%2F1.webp?alt=media&token=c66f9e40-a22e-48b7-965d-66007050051c&_gl=1*1ijoyqy*_ga*NjcxOTQzNTAzLjE2ODEzNjQ0NjI.*_ga_CW55HF8NVT*MTY4NjEyMzQwNS44LjEuMTY4NjEyMzQ3NS4wLjAuMA.."
+                                        alt="Li's Static Banner"
+                                    />
+                                </a>
+                            </div>
+
+                            <div class="shop-top-bar mt-30">
+                                <div class="shop-bar-inner">
+                                    <div class="product-view-mode">
+                                        <ul class="nav shop-item-filter-list" role="tablist">
+                                            <li role="presentation">
+                                                <a data-toggle="tab" role="tab" aria-controls="grid-view" href="#grid-view"><i class="fa fa-th"></i></a>
+                                            </li>
+                                            <li class="active" role="presentation">
+                                                <a aria-selected="true" class="active show" data-toggle="tab" role="tab" aria-controls="list-view" href="#list-view"><i class="fa fa-th-list"></i></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="product-select-box">
+                                    <div class="product-short">
+                                        <p>Sắp xếp theo:</p>
+                                        <select class="nice-select" onchange="changeSortBy(this.value)">
+                                            <option value="" th:selected="${sortBy == ''}">
+                                                Liên quan
+                                            </option>
+                                            <option value="tenSanPhamTangDan" th:selected="${sortBy == 'tenSanPhamTangDan'}">
+                                                Tên (A - Z)
+                                            </option>
+                                            <option value="tenSanPhamGiamDan" th:selected="${sortBy == 'tenSanPhamGiamDan'}">
+                                                Tên (Z - A)
+                                            </option>
+                                            <option value="giaTangDan" th:selected="${sortBy == 'giaTangDan'}">
+                                                Giá (Thấp &gt; Cao)
+                                            </option>
+                                            <option value="giaGiamDan" th:selected="${sortBy == 'giaGiamDan'}">
+                                                Giá (Cao &gt; Thấp)
+                                            </option>
+                                            <option value="soSaoTangDan" th:selected="${sortBy == 'soSaoTangDan'}">
+                                                Đánh giá (Thấp &gt; Cao)
+                                            </option>
+                                            <option value="soSaoGiamDan" th:selected="${sortBy == 'soSaoGiamDan'}">
+                                                Đánh giá (Cao &gt; Thấp)
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="shop-products-wrapper">
+                                <div class="tab-content">
+                                    <div id="grid-view" class="tab-pane fade" role="tabpanel">
+                                        <div class="product-area shop-product-area">
+                                            <div class="row">
+                                                <div class="col-lg-3 col-md-3 col-sm-6 mt-40" th:each="product : ${pg.get('content')}">
+                                                    <div class="single-product-wrap">
+                                                        <div class="product-image">
+                                                            <a th:href="@{|/user/product-details?productId=${product.get('sanPham').get('sanPhamId')}&productName=${product.get('sanPham').get('tenSanPham').asText()}|}">
+                                                                <img th:src="${product.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('duongDanAnh').asText()}" alt="Li's Product Image" />
+                                                            </a>
+                                                            <span class="sticker">New</span>
+                                                        </div>
+                                                        <div class="product_desc">
+                                                            <div class="product_desc_info">
+                                                                <div class="product-review">
+                                                                    <h5 class="manufacturer">
+                                                                        <a href="/user/shop-list" th:text="${product.get('sanPham').get('danhMucSanPham').get('tenDanhMucSanPham').asText()} + ' Brand'"></a>
+                                                                    </h5>
+                                                                    <div class="rating-box">
+                                                                        <ul class="rating">
+                                                                            <th:block th:with="totalStars=${#numbers.sequence(1, 5)}">
+                                                                                <th:block th:with="soSao=${#strings.contains(product.get('soSao'), 'null') ? 0 : product.get('soSao').asInt()}">
+                                                                                    <th:block th:each="star : ${totalStars}">
+                                                                                        <li th:class="${soSao >= star} ? 'filled-star' : 'no-star'">
+                                                                                            <i class="fa fa-star"></i>
+                                                                                        </li>
+                                                                                    </th:block>
+                                                                                </th:block>
+                                                                            </th:block>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                                <h4>
+                                                                    <a
+                                                                        class="product_name"
+                                                                        th:href="@{|/user/product-details?productId=${product.get('sanPham').get('sanPhamId')}&productName=${product.get('sanPham').get('tenSanPham').asText()}|}"
+                                                                        th:text="${product.get('sanPham').get('tenSanPham').asText()}"
+                                                                    ></a>
+                                                                </h4>
+                                                                <div class="price-box">
+                                                                    <span class="new-price new-price-2" th:if="${#strings.contains(product.get('giamGia').asText(), 'true')}">
+                                                                        <span th:with="giamGia = ${product.get('phanTramGiamGia').asInt()}">
+                                                                            <span th:if="${giamGia > 0}">
+                                                                                <span th:text="${#numbers.formatDecimal(product.get('tongGia').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                            </span>
+                                                                        </span>
+                                                                    </span>
+                                                                    <span class="new-price" th:if="${#strings.contains(product.get('giamGia').asText(), 'false')}">
+                                                                        <span th:text="${#numbers.formatDecimal(product.get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                    </span>
+                                                                    <span class="old-price" th:if="${#strings.contains(product.get('giamGia').asText(), 'true')}">
+                                                                        <span th:with="giamGia = ${product.get('phanTramGiamGia').asInt()}">
+                                                                            <span th:if="${giamGia > 0}">
+                                                                                <span th:text="${#numbers.formatDecimal(product.get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                            </span>
+                                                                        </span>
+                                                                    </span>
+                                                                    <span class="discount-percentage" th:if="${product.get('phanTramGiamGia').asInt()} > 0">
+                                                                        <span th:text="'-' + ${product.get('phanTramGiamGia').asInt()} + '%'"></span>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="add-actions">
+                                                                <ul class="add-actions-link">
+                                                                    <li class="add-cart active" th:data-color-id="@{|${product.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('mauSacId')}|}"
+                                                                    th:attr="ng-click='addToCart(' + ${product.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('mauSacId')} + ', 1);'"
+                                                                    >
+                                                                        <a>Thêm vào giỏ</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="list-view" class="tab-pane fade product-list-view active show" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="row product-layout-list" th:each="product : ${pg.get('content')}">
+                                                    <div class="col-lg-3 col-md-5">
+                                                        <div class="product-image">
+                                                            <a th:href="@{|/user/product-details?productId=${product.get('sanPham').get('sanPhamId')}&productName=${product.get('sanPham').get('tenSanPham').asText()}|}">
+                                                                <img th:src="${product.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('duongDanAnh').asText()}" alt="Li's Product Image" />
+                                                            </a>
+                                                            <span class="sticker">New</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-5 col-md-7">
+                                                        <div class="product_desc">
+                                                            <div class="product_desc_info">
+                                                                <div class="product-review">
+                                                                    <h5 class="manufacturer">
+                                                                        <a href="/user/shop-list" th:text="${product.get('sanPham').get('danhMucSanPham').get('tenDanhMucSanPham').asText()} + ' Brand'"></a>
+                                                                    </h5>
+                                                                    <div class="rating-box">
+                                                                        <ul class="rating">
+                                                                            <th:block th:with="totalStars=${#numbers.sequence(1, 5)}">
+                                                                                <th:block th:with="soSao=${#strings.contains(product.get('soSao'), 'null') ? 0 : product.get('soSao').asInt()}">
+                                                                                    <th:block th:each="star : ${totalStars}">
+                                                                                        <li th:class="${soSao >= star} ? 'filled-star' : 'no-star'">
+                                                                                            <i class="fa fa-star"></i>
+                                                                                        </li>
+                                                                                    </th:block>
+                                                                                </th:block>
+                                                                            </th:block>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                                <h4>
+                                                                    <a
+                                                                        class="product_name"
+                                                                        th:href="@{|/user/product-details?productId=${product.get('sanPham').get('sanPhamId')}&productName=${product.get('sanPham').get('tenSanPham').asText()}|}"
+                                                                        th:text="${product.get('sanPham').get('tenSanPham').asText()}"
+                                                                    ></a>
+                                                                </h4>
+                                                                <div class="price-box">
+                                                                    <span class="new-price new-price-2" th:if="${#strings.contains(product.get('giamGia').asText(), 'true')}">
+                                                                        <span th:with="giamGia = ${product.get('phanTramGiamGia').asInt()}">
+                                                                            <span th:if="${giamGia > 0}">
+                                                                                <span th:text="${#numbers.formatDecimal(product.get('tongGia').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                            </span>
+                                                                        </span>
+                                                                    </span>
+                                                                    <span class="new-price" th:if="${#strings.contains(product.get('giamGia').asText(), 'false')}">
+                                                                        <span th:text="${#numbers.formatDecimal(product.get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                    </span>
+                                                                    <span class="old-price" th:if="${#strings.contains(product.get('giamGia').asText(), 'true')}">
+                                                                        <span th:with="giamGia = ${product.get('phanTramGiamGia').asInt()}">
+                                                                            <span th:if="${giamGia > 0}">
+                                                                                <span th:text="${#numbers.formatDecimal(product.get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                            </span>
+                                                                        </span>
+                                                                    </span>
+                                                                    <span class="discount-percentage" th:if="${product.get('phanTramGiamGia').asInt()} > 0">
+                                                                        <span th:text="'-' + ${product.get('phanTramGiamGia').asInt()} + '%'"></span>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="shop-add-action mb-xs-30">
+                                                            <div class="cpu">
+                                                                <span class="cpu-title">CPU:</span>
+                                                                <span class="cpu-value" th:text="${product.get('sanPham').get('sanPhamCauHinhDienThoais').get(0).get('cpu').asText()}"></span>
+                                                            </div>
+                                                            <div class="ram">
+                                                                <span class="ram-title">RAM:</span>
+                                                                <span class="ram-value" th:text="${product.get('sanPham').get('sanPhamCauHinhDienThoais').get(0).get('ram').asText()}"></span>
+                                                            </div>
+                                                            <div class="boNhoTrong">
+                                                                <span class="boNhoTrong-title">Bộ nhớ trong:</span>
+                                                                <span class="boNhoTrong-value" th:text="${product.get('sanPham').get('sanPhamCauHinhDienThoais').get(0).get('boNhoTrong').asText()}"></span>
+                                                            </div>
+                                                            <div class="manHinh">
+                                                                <span class="manHinh-title">Màn hình:</span>
+                                                                <span class="manHinh-value" th:text="${product.get('sanPham').get('sanPhamCauHinhDienThoais').get(0).get('manHinh').asText()}"></span>
+                                                            </div>
+                                                            <div class="camera">
+                                                                <span class="camera-title">Camera:</span>
+                                                                <span class="camera-value" th:text="${product.get('sanPham').get('sanPhamCauHinhDienThoais').get(0).get('camera').asText()}"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="paginatoin-area">
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6">
+                                                <th:block th:if="${#strings.contains(pg.get('totalElements').toString(), '0')} == true">
+                                                    <p>Rất tiếc, klbstore.com không tìm thấy kết quả nào phù hợp với từ khóa [[${param.keywords}]]</p>
+                                                </th:block>
+                                                <th:block th:if="${#strings.contains(pg.get('totalElements').toString(), '0')} == false">
+                                                    <p th:text="'Hiển thị ' + ${pg.get('number').asInt() + 1} + '-' + ${pg.get('numberOfElements')} + ' trong tổng số ' + ${pg.get('totalElements').asInt()}  + ' sản phẩm'"></p>
+                                                </th:block>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6" th:if="${#strings.contains(pg.get('totalElements').toString(), '0')} == false">
+                                                <ul class="pagination-box">
+                                                    <li th:class="${#strings.contains(pg.get('first'), 'true') ? 'disabled' : ''}">
+                                                        <th:block th:if="${param.nhomSanPhamId}">
+                                                            <a th:href="@{/user/shop-list(page=${pg.get('number')}, nhomSanPhamId=${param.nhomSanPhamId}, sortBy=${sortBy})}" class="Previous"> <i class="fa fa-chevron-left"></i> Trước </a>
+                                                        </th:block>
+                                                        <th:block th:if="${param.keywords}">
+                                                            <a th:href="@{/user/search(page=${pg.get('number')}, keywords=${param.keywords}, sortBy=${sortBy})}" class="Previous"> <i class="fa fa-chevron-left"></i> Trước </a>
+                                                        </th:block>
+                                                    </li>
+                                                    <li th:class="${#strings.contains(pg.get('last'), 'true') ? 'disabled' : ''}"></li>
+                                                    <th:block th:if="${param.nhomSanPhamId}">
+                                                        <li th:each="pageNumber : ${#numbers.sequence(1, pg.get('totalPages').asInt())}" th:class="${pageNumber == pg.get('number').asInt() + 1 ? 'active' : ''}">
+                                                            <a th:href="@{/user/shop-list(page=${pageNumber}, nhomSanPhamId=${param.nhomSanPhamId}, sortBy=${sortBy})}" th:text="${pageNumber}"></a>
+                                                        </li>
+                                                    </th:block>
+                                                    <th:block th:if="${param.keywords}">
+                                                        <li th:each="pageNumber : ${#numbers.sequence(1, pg.get('totalPages').asInt())}" th:class="${pageNumber == pg.get('number').asInt() + 1 ? 'active' : ''}">
+                                                            <a th:href="@{/user/search(page=${pageNumber}, keywords=${param.keywords}, sortBy=${sortBy})}" th:text="${pageNumber}"></a>
+                                                        </li>
+                                                    </th:block>
+                                                    <li th:class="${#strings.contains(pg.get('last'), 'true') ? 'disabled' : ''}">
+                                                        <th:block th:if="${param.nhomSanPhamId}">
+                                                            <a th:href="@{/user/shop-list(page=${pg.get('number').asInt() + 2}, nhomSanPhamId=${param.nhomSanPhamId}, sortBy=${sortBy})}" class="Next"> Sau <i class="fa fa-chevron-right"></i> </a>
+                                                        </th:block>
+                                                        <th:block th:if="${param.keywords}">
+                                                            <a th:href="@{/user/search(page=${pg.get('number').asInt() + 2}, keywords=${param.keywords}, sortBy=${sortBy})}" class="Next"> Sau <i class="fa fa-chevron-right"></i> </a>
+                                                        </th:block>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

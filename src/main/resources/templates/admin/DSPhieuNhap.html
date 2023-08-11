@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{/admin/_admin}">
+<head>
+  <title>KLB Store</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-container">
+			<div class="pd-ltr-20 xs-pd-20-10">
+				<div class="min-height-200px">
+					<div class="page-header">
+						<div class="row">
+							<div class="col-md-6 col-sm-12">
+								<div class="title">
+									<h4>Quản lý phiếu nhập xuất</h4>
+								</div>
+								<nav aria-label="breadcrumb" role="navigation">
+									<ol class="breadcrumb">
+										<li class="breadcrumb-item">
+											<a href="index3.html">Trang Chủ</a>
+										</li>
+										<li class="breadcrumb-item active" aria-current="page">
+											Quản lý phiếu nhập xuất
+										</li>
+									</ol>
+								</nav>
+							</div>
+						</div>
+					</div>
+					<!-- Simple Datatable start -->
+					<div class="card-box mb-30">
+						<div class="pd-20">
+                            <p class="mb-0">
+                                <a th:href="@{/admin/phieunhap/edit}" class="btn btn-outline-success">Thêm Mới</a>
+                            </p>
+                        </div>
+						<div class="pb-20">
+							<table class="data-table table stripe hover nowrap">
+								<thead>
+									<tr>
+										<th class="table-plus"><a th:href="@{/admin/phieunhap?sortBy=phieuNhapId}">Mã Phiếu Nhập</a></th>
+										<th>Tên Người Dùng</th>
+										<th><a th:href="@{/admin/phieunhap?sortBy=nhaCungCap.tenNhaCungCap}">Nhà Cung Cấp</a></th>
+										<th>Tổng Tiền</th>
+										<th><a th:href="@{/admin/phieunhap?sortBy=ngayNhap}">Ngày Nhập</a></th>
+										<th class="datatable-nosort">Thao Tác</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="tblPhieuNhap : ${items}">
+										<td th:text="${tblPhieuNhap.phieuNhapId}" class="table-plus"></td>
+										<td th:text="${tblPhieuNhap.nguoiDung.nguoiDungId}"></td>
+										<td th:text="${tblPhieuNhap.nhaCungCap.tenNhaCungCap}"></td>
+										<td th:text="${tblPhieuNhap.tongTien}"></td>
+										<td th:text="${tblPhieuNhap.ngayNhap}"></td>
+										<td>
+											<div class="dropdown">
+												<a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button"
+													data-toggle="dropdown">
+													<i class="dw dw-more"></i>
+												</a>
+												<div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+											
+													<a class="dropdown-item" th:href="@{/admin/phieunhap/edit/__${tblPhieuNhap.phieuNhapId}__}"><i class="dw dw-edit2"></i> Chỉnh Sửa</a>
+													<a class="dropdown-item" th:href="@{/admin/phieunhap/delete/__${tblPhieuNhap.phieuNhapId}__}"><i class="dw dw-delete-3"></i> Xóa</a>
+												</div>
+											</div>
+										</td>
+									</tr>
+									
+								</tbody>
+							</table>
+							<div style="margin: 0px 4px;" class="row">
+                                <div class="col">
+                                    <b>Trang: <span th:text="${items.number + 1}"></span> / <span th:text="${items.totalPages}"></span></b>
+                                </div>
+                                <div class="col-3">
+                                    <div class="navbar">
+                                        <a th:href="@{/admin/phieunhap?p=0}"><i class="bi bi-chevron-double-left"></i></a>
+                                        <span th:if="${curr}>0"><a th:href="@{/admin/phieunhap?p=__${items.number-1}__}"><i class="bi bi-chevron-left"></i></a></span>
+                                        <span th:if="${curr} < ${numberOfpages} - 1"><a th:href="@{/admin/phieunhap?p=__${items.number+1}__}"><i class="bi bi-chevron-right"></i></a></span>
+                                        <!-- <a href="" th:each="i : ${items.number + 1}" th:text="${i}"></a> -->
+                                        <span th:if="${curr} < ${numberOfpages} - 1"><a th:href="@{/admin/phieunhap?p=__${items.totalPages-1}__}"><i class="bi bi-chevron-double-right"></i></a></span>
+                                    </div>
+                                </div>
+                            </div>
+						</div>
+					</div>
+					<!-- Simple Datatable End -->
+					<div class="footer-wrap pd-20 mb-20 card-box">
+						KLB - Công ty trách nhiệm hữu hạng 3 thành viên
+						<a href="https://github.com/chibao2k3" target="_blank"
+							>ChiBao2k3</a
+						>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+</body>
+</html>

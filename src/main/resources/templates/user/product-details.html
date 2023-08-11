@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+    <head>
+        <title>KLB Store</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="breadcrumb-area">
+                <div class="container">
+                    <div class="breadcrumb-content">
+                        <ul>
+                            <li><a href="/user/index">Trang chủ</a></li>
+                            <li class="active">Chi tiết sản phẩm</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-wraper">
+                <div class="container">
+                    <div class="row single-product-area">
+                        <div class="col-lg-5 col-md-6">
+                            <div class="product-details-left">
+                                <div class="product-details-images slider-navigation-1">
+                                    <div class="lg-image" th:each="ct : ${chiTiet.get(0).get('sanPham').get('sanPhamChiTietSanPhams')}">
+                                        <img th:src="${ct.get('mauSac').get('duongDanAnh').asText()}" alt="product image" />
+                                    </div>
+                                </div>
+                                <div class="product-details-thumbs slider-thumbs-1">
+                                    <div class="sm-image" th:each="ct : ${chiTiet.get(0).get('sanPham').get('sanPhamChiTietSanPhams')}" th:data-mau-sac-id="${ct.get('mauSac').get('mauSacId')}">
+                                        <img th:src="${ct.get('mauSac').get('duongDanAnh').asText()}" alt="product image thumb" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-7 col-md-6">
+                            <div class="product-details-view-content pt-60">
+                                <div class="product-info">
+                                    <h2 th:text="${chiTiet.get(0).get('sanPham').get('tenSanPham').asText()}"></h2>
+                                    <span class="product-details-ref" th:text="'Xuất sứ: ' + ${chiTiet.get(0).get('sanPham').get('xuatSu').asText()}"></span>
+                                    <div class="rating-box pt-20">
+                                        <ul class="rating rating-with-review-item">
+                                            <th:block th:with="totalStars=${#numbers.sequence(1, 5)}">
+                                                <th:block th:with="soSao=${#strings.contains(chiTiet.get(0).get('soSao'), 'null') ? 0 : chiTiet.get(0).get('soSao').asInt()}">
+                                                    <th:block th:each="star : ${totalStars}">
+                                                        <li th:class="${soSao >= star} ? 'filled-star' : 'no-star'">
+                                                            <i class="fa fa-star"></i>
+                                                        </li>
+                                                    </th:block>
+                                                </th:block>
+                                            </th:block>
+                                        </ul>
+                                    </div>
+                                    <div class="price-box pt-20">
+                                        <span class="new-price new-price-2" th:if="${#strings.contains(chiTiet.get(0).get('giamGia').asText(), 'true')}">
+                                            <span th:with="giamGia = ${chiTiet.get(0).get('phanTramGiamGia').asInt()}">
+                                                <span th:if="${giamGia > 0}">
+                                                    <span th:text="${#numbers.formatDecimal(chiTiet.get(0).get('tongGia').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span class="new-price" th:if="${#strings.contains(chiTiet.get(0).get('giamGia').asText(), 'false')}">
+                                            <span th:text="${#numbers.formatDecimal(chiTiet.get(0).get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                        </span>
+                                        <span class="old-price" th:if="${#strings.contains(chiTiet.get(0).get('giamGia').asText(), 'true')}">
+                                            <span th:with="giamGia = ${chiTiet.get(0).get('phanTramGiamGia').asInt()}">
+                                                <span th:if="${giamGia > 0}">
+                                                    <span th:text="${#numbers.formatDecimal(chiTiet.get(0).get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span class="discount-percentage" th:if="${chiTiet.get(0).get('phanTramGiamGia').asInt()} > 0">
+                                            <span th:text="'-' + ${chiTiet.get(0).get('phanTramGiamGia').asInt()} + '%'"></span>
+                                        </span>
+                                    </div>
+                                    <div class="product-description">
+                                        <p th:text="${chiTiet.get(0).get('sanPham').get('moTa')}"></p>
+                                    </div>
+                                    <div class="product-variants">
+                                        <div class="produt-variants-size">
+                                            <label>Màu sắc:</label>
+                                            <select class="nice-select">
+                                                <option
+                                                    th:each="ct : ${chiTiet.get(0).get('sanPham').get('sanPhamChiTietSanPhams')}"
+                                                    th:value="${ct.get('mauSac').get('mauSacId')}"
+                                                    th:text="${ct.get('mauSac').get('tenMauSac').asText()}"
+                                                ></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="single-add-to-cart">
+                                        <form action="#" class="cart-quantity">
+                                            <div class="quantity">
+                                                <label>Số lượng</label>
+                                                <div class="cart-plus-minus">
+                                                    <input class="cart-plus-minus-box" value="1" type="text" ng-model="quantityDetail"/>
+                                                    <div class="dec qtybutton" ng-click="decreaseDetailQuantity()">
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </div>
+                                                    <div class="inc qtybutton" ng-click="increaseDetailQuantity()">
+                                                        <i class="fa fa-angle-up"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <a class="add-to-cart" id="detailAdd" ng-click="addDetailCart()" type="submit" th:data-color-id="${chiTiet.get(0).get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('mauSacId')}">
+                                                Thêm vào giỏ
+                                            </a>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-area pt-35">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="li-product-tab">
+                                            <ul class="nav li-product-menu">
+                                                <li>
+                                                    <a class="active" data-toggle="tab" href="#description"><span>Mô tả</span></a>
+                                                </li>
+                                                <li>
+                                                    <a data-toggle="tab" href="#reviews"><span>Đánh giá</span></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-content">
+                                    <div id="description" class="tab-pane active show" role="tabpanel">
+                                        <div class="product-description">
+                                            <span th:text="${chiTiet.get(0).get('sanPham').get('moTa')}"></span>
+                                        </div>
+                                    </div>
+                                    <div id="reviews" class="tab-pane" role="tabpanel">
+                                        <div class="product-reviews">
+                                            <div class="product-details-comment-block">
+                                                <div class="comment-review">
+                                                    <span>Tổng số đánh giá</span>
+                                                    <ul class="rating">
+                                                        <th:block th:with="totalStars=${#numbers.sequence(1, 5)}">
+                                                            <th:block th:with="soSao=${#strings.contains(chiTiet.get(0).get('soSao'), 'null') ? 0 : chiTiet.get(0).get('soSao').asInt()}">
+                                                                <th:block th:each="star : ${totalStars}">
+                                                                    <li th:class="${soSao >= star} ? 'filled-star' : 'no-star'"><i class="fa fa-star"></i></li>
+                                                                </th:block>
+                                                            </th:block>
+                                                        </th:block>
+                                                    </ul>
+                                                </div>
+                                                <th:block th:if="${#strings.contains(chiTiet.get(0).get('sanPham').get('sanPhamDanhGias'), '[]')}">
+                                                    <p class="comment-details">Chưa có đánh giá nào</p>
+                                                </th:block>
+                                                <th:block th:unless="${#strings.contains(chiTiet.get(0).get('sanPham').get('sanPhamDanhGias'), '[]')}">
+                                                    <th:block th:each="dg: ${chiTiet.get(0).get('sanPham').get('sanPhamDanhGias')}">
+                                                        <div class="comment-author-infos pt-25">
+                                                            <span th:text="${dg.get('nguoiDung').get('hoTen').asText()}">Khách hàng ẩn danh</span>
+                                                            <em th:text="${dg.get('ngayDanhGia').asText()}"></em>
+                                                        </div>
+                                                        <div class="comment-details" th:text="${dg.get('noiDung').asText()}"></div>
+                                                    </th:block>
+                                                </th:block>
+                                                <div class="review-btn pt-3">
+                                                    <a class="review-links" href="#" data-toggle="modal" data-target="#mymodal">Viết đánh giá của bạn!</a>
+                                                </div>
+                                                <div class="modal fade modal-wrapper" id="mymodal">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-body">
+                                                                <h3 class="review-page-title">Viết đánh giá của bạn</h3>
+                                                                <div class="modal-inner-area row">
+                                                                    <div class="col-lg-6">
+                                                                        <div class="li-review-product">
+                                                                            <img th:src="${chiTiet.get(0).get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('duongDanAnh').asText()}" alt="Li's Product Image" />
+                                                                            <div class="li-review-product-desc">
+                                                                                <h4 class="li-product-name" th:text="${chiTiet.get(0).get('sanPham').get('tenSanPham').asText()}"></h4>
+                                                                                <p>
+                                                                                    <span th:text="${chiTiet.get(0).get('sanPham').get('moTa')}"></span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                        <div class="li-review-content">
+                                                                            <div class="feedback-area">
+                                                                                <div class="feedback">
+                                                                                    <h3 class="feedback-title">Đánh giá sản phẩm</h3>
+                                                                                    <form action="/user/rate" method="POST">
+                                                                                        <p class="your-opinion">
+                                                                                            <label>Đánh giá</label>
+                                                                                            <span>
+                                                                                                <select class="star-rating">
+                                                                                                    <option value="1">1</option>
+                                                                                                    <option value="2">2</option>
+                                                                                                    <option value="3">3</option>
+                                                                                                    <option value="4">4</option>
+                                                                                                    <option value="5">5</option>
+                                                                                                </select>
+                                                                                            </span>
+                                                                                        </p>
+                                                                                        <p class="feedback-form">
+                                                                                            <label for="feedback">Nội dung đánh giá</label>
+                                                                                            <textarea id="feedback" name="comment" cols="45" rows="8" aria-required="true" maxlength="200" required></textarea>
+                                                                                        </p>
+                                                                                        <div class="feedback-input">
+                                                                                            <p class="feedback-form-author">
+                                                                                                <label for="author">Tên<span class="required">*</span> </label>
+                                                                                                <input id="author" name="author" value="" size="30" aria-required="true" type="text" />
+                                                                                            </p>
+                                                                                            <p class="feedback-form-author feedback-form-email">
+                                                                                                <label for="email">Email<span class="required">*</span> </label>
+                                                                                                <input id="email" name="email" value="" size="30" aria-required="true" type="text" />
+                                                                                            </p>
+                                                                                            <div class="feedback-btn pb-15">
+                                                                                                <button class="btn btn-primary">Gửi</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </form>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <section class="product-area li-laptop-product pt-30 pb-50">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="li-section-title">
+                                        <h2>
+                                            <span>Sản phẩm liên quan:</span>
+                                        </h2>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="row">
+                                                <div class="product-active owl-carousel">
+                                                    <div class="col-lg-12" th:each="product : ${sanPhamLienQuan}">
+                                                        <div class="single-product-wrap">
+                                                            <div class="product-image">
+                                                                <a th:href="@{|/user/product-details?productId=${product.get('sanPham').get('sanPhamId')}&productName=${product.get('sanPham').get('tenSanPham').asText()}|}">
+                                                                    <img th:src="${product.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('duongDanAnh').asText()}" alt="Li's Product Image" />
+                                                                </a>
+                                                                <span class="sticker">New</span>
+                                                            </div>
+                                                            <div class="product_desc">
+                                                                <div class="product_desc_info">
+                                                                    <div class="product-review">
+                                                                        <h5 class="manufacturer">
+                                                                            <a href="/user/shop-list" th:text="${product.get('sanPham').get('danhMucSanPham').get('tenDanhMucSanPham').asText()} + ' Brand'"></a>
+                                                                        </h5>
+                                                                        <div class="rating-box">
+                                                                            <ul class="rating">
+                                                                                <th:block th:with="totalStars=${#numbers.sequence(1, 5)}">
+                                                                                    <th:block th:with="soSao=${#strings.contains(product.get('soSao'), 'null') ? 0 : product.get('soSao').asInt()}">
+                                                                                        <th:block th:each="star : ${totalStars}">
+                                                                                            <li th:class="${soSao >= star} ? 'filled-star' : 'no-star'"><i class="fa fa-star"></i></li>
+                                                                                        </th:block>
+                                                                                    </th:block>
+                                                                                </th:block>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h4>
+                                                                        <a
+                                                                            class="product_name"
+                                                                            th:href="@{|/user/product-details?productId=${product.get('sanPham').get('sanPhamId')}&productName=${product.get('sanPham').get('tenSanPham').asText()}|}"
+                                                                            th:text="${product.get('sanPham').get('tenSanPham').asText()}"
+                                                                        ></a>
+                                                                    </h4>
+                                                                    <div class="price-box">
+                                                                        <span class="new-price new-price-2" th:if="${#strings.contains(product.get('giamGia').asText(), 'true')}">
+                                                                            <span th:with="giamGia = ${product.get('phanTramGiamGia').asInt()}">
+                                                                                <span th:if="${giamGia > 0}">
+                                                                                    <span th:text="${#numbers.formatDecimal(product.get('tongGia').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                                </span>
+                                                                            </span>
+                                                                        </span>
+                                                                        <span class="new-price" th:if="${#strings.contains(product.get('giamGia').asText(), 'false')}">
+                                                                            <span th:text="${#numbers.formatDecimal(product.get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                        </span>
+                                                                        <span class="old-price" th:if="${#strings.contains(product.get('giamGia').asText(), 'true')}">
+                                                                            <span th:with="giamGia = ${product.get('phanTramGiamGia').asInt()}">
+                                                                                <span th:if="${giamGia > 0}">
+                                                                                    <span th:text="${#numbers.formatDecimal(product.get('sanPham').get('giaBan').asDouble(), 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+                                                                                </span>
+                                                                            </span>
+                                                                        </span>
+                                                                        <span class="discount-percentage" th:if="${product.get('phanTramGiamGia').asInt()} > 0">
+                                                                            <span th:text="'-' + ${product.get('phanTramGiamGia').asInt()} + '%'"></span>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="add-actions">
+                                                                    <ul class="add-actions-link">
+                                                                        <li class="add-cart active" th:data-color-id="@{|${product.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('mauSacId')}|}"
+                                                                        th:attr="ng-click='addToCart(' + ${product.get('sanPham').get('sanPhamChiTietSanPhams').get(0).get('mauSac').get('mauSacId')} + ', 1);'"
+                                                                        >
+                                                                            <a>Thêm vào giỏ</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
