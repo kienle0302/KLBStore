@@ -9,6 +9,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.klbstore.config.SecurityRestTemplate;
 import com.klbstore.dao.ChiTietGioHangDAO;
 import com.klbstore.dao.MauSacDAO;
+import com.klbstore.dao.NguoiDungDAO;
 import com.klbstore.delivery.District;
 import com.klbstore.delivery.DistrictResponse;
 import com.klbstore.delivery.Province;
@@ -45,9 +48,17 @@ public class ChiTietGioHangRestController {
     @Autowired
     SecurityRestTemplate restTemplate;
 
+    @Autowired
+    NguoiDungDAO nguoiDungDAO;
+
+    public NguoiDung getNguoiDung() { 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return  nguoiDungDAO.findByTenDangNhap(auth.getName()).get();
+    }
+
     @GetMapping("/authozied/login")
     public ResponseEntity<Integer> login() {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         return ResponseEntity.ok().body(nguoiDung.getNguoiDungId());
     }
 
@@ -55,7 +66,7 @@ public class ChiTietGioHangRestController {
     public ResponseEntity<Object> addToCart(@RequestParam("colorId") int mauSacId,
             @RequestParam("quantity") Optional<Integer> soLuong,
             @RequestParam(value = "userId", defaultValue = "0") int userId) {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         // int actualUserId = (userId != 0) ? userId : nguoiDung.getNguoiDungId();
         if (nguoiDung != null) {
             Map<String, Object> result = chiTietGioHangDAO.themSanPhamVaoGioHang(mauSacId, soLuong.orElse(1),
@@ -85,7 +96,7 @@ public class ChiTietGioHangRestController {
     @PostMapping("/update")
     public ResponseEntity<Object> updateToCart(@RequestParam("colorId") int mauSacId,
             @RequestParam("quantity") Optional<Integer> soLuong) {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         if (nguoiDung != null) {
             Map<String, Object> result = chiTietGioHangDAO.capNhatSanPhamTrongGioHang(mauSacId, soLuong.orElse(1),
                     nguoiDung.getNguoiDungId());
@@ -115,7 +126,7 @@ public class ChiTietGioHangRestController {
 
     @PostMapping("/delete")
     public ResponseEntity<Object> deleteToCart(@RequestParam("colorId") int mauSacId) {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         if (nguoiDung != null) {
             chiTietGioHangDAO.xoaSanPhamKhoiGioHang(mauSacId, nguoiDung.getNguoiDungId());
             return ResponseEntity.ok().build();
@@ -169,7 +180,7 @@ public class ChiTietGioHangRestController {
 
     @GetMapping("/giohanginfo")
     public Map<String, Object> getGioHangInfo() {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         int tongSoSanPham = 0;
         double tongTien = 0;
         if (nguoiDung != null) {
@@ -195,7 +206,7 @@ public class ChiTietGioHangRestController {
 
     @GetMapping("/get")
     public ResponseEntity<AllChiTietGioHangDTO> hello() {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         if (nguoiDung != null) {
             String diaChi = nguoiDung.getDiaChi();
             String[] diaChiComponents = diaChi.split(","); // Tách theo dấu phẩy
@@ -229,7 +240,7 @@ public class ChiTietGioHangRestController {
 
     @GetMapping("/findColorId")
     public ResponseEntity<Map<String, Object>> color(@RequestParam("colorId") int mauSacId) {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         if (nguoiDung != null) {
             chiTietGioHangDAO.kiemTraVaXoaSanPhamKhongHopLeTrongGioHang(nguoiDung.getNguoiDungId());
             AllChiTietGioHangDTO allChiTietGioHangDTO = new AllChiTietGioHangDTO(

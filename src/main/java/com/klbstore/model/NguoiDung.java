@@ -1,13 +1,21 @@
 package com.klbstore.model;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,13 +25,21 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Data
+@Builder
 @Entity
 @Getter
 @Setter
-public class NguoiDung implements Serializable {
+@AllArgsConstructor
+@NoArgsConstructor
+public class NguoiDung implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,6 +89,10 @@ public class NguoiDung implements Serializable {
     @Column
     private boolean trangThaiKhoa = false;
 
+    // New column - ROLE
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @JsonIgnore
     @OneToMany(mappedBy = "nguoiDung")
     private List<DonHang> nguoiDungDonHangs;
@@ -80,7 +100,7 @@ public class NguoiDung implements Serializable {
     @JsonIgnore
     @OneToMany(mappedBy = "nguoiDung")
     private List<SanPham> nguoiDungSanPhams;
-    
+
     @JsonIgnore
     @OneToMany(mappedBy = "nguoiDung")
     private List<PhieuXuat> nguoiDungPhieuXuats;
@@ -104,5 +124,58 @@ public class NguoiDung implements Serializable {
     @JsonIgnore
     @OneToMany(mappedBy = "nguoiDung")
     private List<HoatDongSaiMatKhau> nguoiDungHoatDongSaiMatKhaus;
+
+    public NguoiDung(
+            String tenDangNhap,
+            String matKhau,
+            String email,
+            String hoTen,
+            Date ngaySinh,
+            String sdt,
+            Role role) {
+        this.tenDangNhap = tenDangNhap;
+        this.matKhau = matKhau;
+        this.email = email;
+        this.hoTen = hoTen;
+        this.ngaySinh = ngaySinh;
+        this.sdt = sdt;
+        this.role = role;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.name());
+        return Collections.singletonList(authority);
+    }
+
+    @Override
+    public String getUsername() {
+        return tenDangNhap;
+    }
+
+    @Override
+    public String getPassword() {
+        return matKhau;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !trangThaiKhoa;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return quyenDangNhap;
+    }
 
 }

@@ -8,13 +8,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.klbstore.dto.SanPhamDTO;
 import com.klbstore.model.SanPham;
-
-import jakarta.transaction.Transactional;
-
+@Repository
+@Transactional(readOnly = true)
 public interface SanPhamDAO extends JpaRepository<SanPham, Integer> {
+       @Transactional
         @Query("SELECT s FROM SanPham s "
                         + "JOIN s.sanPhamChiTietSanPhams c "
                         + "WHERE s.hienThi = true "
@@ -194,6 +196,7 @@ public interface SanPhamDAO extends JpaRepository<SanPham, Integer> {
                         "AND (:viTriLuuTru IS NULL OR chiTiet.viTriLuuTru LIKE CONCAT('%', :viTriLuuTru, '%'))")
                  List<SanPham> findSanPhamHetHang(@Param("soLuongTrongKho") Integer soLuongTrongKho, @Param("minSoLuongTrongKho") Integer minSoLuongTrongKho, @Param("maxSoLuongTrongKho") Integer maxSoLuongTrongKho, @Param("mauSacId") Integer mauSacId, @Param("tenMauSac") String tenMauSac, @Param("duongDanAnh") String duongDanAnh,@Param("viTriLuuTru") String viTriLuuTru);
 
+                 @Transactional
                         @Query("SELECT new com.klbstore.dto.SanPhamDTO(sp, " +
                         "CASE WHEN (ggTrucTiep IS NOT NULL " +
                         "AND ggTrucTiep.ngayBatDau <= CURRENT_TIMESTAMP " +

@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Login implements Serializable{
+public class Login implements Serializable {
     @NotBlank(message = "Hãy nhập số điện thoại")
     private String sdt;
-    
+
     @NotBlank(message = "Hãy nhập mật khẩu")
     private String matKhau;
 }

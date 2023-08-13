@@ -12,17 +12,38 @@
                 <div class="col-lg-9 col-md-8">
                     <div class="header-top-right">
                         <ul class="ht-menu">
-                            <li>
-                                <div class="ht-setting-trigger"><span>Cài đặt</span></div>
-                                <div class="setting ht-setting">
-                                    <ul class="ht-setting-list">
-                                        <li th:if="${useHeader}"><a href="/user/profile">Tài khoản</a></li>
-                                        <li th:if="${useHeader}"><a href="/user/order">Đơn mua</a></li>
-                                        <li th:if="!${useHeader}"><a href="/user/login-register">Đăng nhập</a></li>
-                                        <li th:if="${useHeader}"><a href="/user/log-out">Đăng xuất</a></li>
+                            <style>
+                                .dropdown:hover>.dropdown-menu {
+                                    display: block;
+                                }
+
+                                .dropdown>.dropdown-toggle:active {
+                                    /*Without this, clicking will make it sticky*/
+                                    pointer-events: none;
+                                }
+                            </style>
+                            <div ng-app="app" ng-controller="ctrl">
+                                <div class="dropdown" th:if="${userLogged}">
+                                    <b th:if="${userLogged}">
+                                        <a th:href="@{|/user/profile|}">
+                                            <i class="fas fa-user"></i>&nbsp;
+                                            <span>[[${userLogged}]]</span>
+                                        </a>
+                                    </b>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <li>
+                                            <a class="dropdown-item" href="javascript: document.logoutForm.submit()">
+                                                Đăng xuất</a>
+                                        </li>
                                     </ul>
                                 </div>
-                            </li>
+                            </div>
+                            <li th:unless="${userLogged}"><a href="/user/login">Đăng nhập</a></li>
+                            <li th:unless="${userLogged}"><a href="/user/register">Đăng ký</a></li>
+
+                            <form name="logoutForm" th:action="@{/logout}" method="post" th:hidden="true">
+                                <input type="submit" value="Sign Out" hidden>
+                            </form>
                         </ul>
                     </div>
                 </div>

@@ -20,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -64,8 +66,6 @@ import com.klbstore.model.NguoiDung;
 import com.klbstore.model.SanPham;
 import com.klbstore.service.CookieService;
 import com.klbstore.service.MailerServiceImpl;
-import com.klbstore.service.ParamService;
-import com.klbstore.service.SessionService;
 import com.klbstore.service.ShoppingCartService;
 import com.klbstore.valid.ChangePass;
 import com.klbstore.valid.EmailForm;
@@ -83,10 +83,6 @@ public class UserController {
     NguoiDungDAO nguoiDungDao;
     @Autowired
     CookieService cookieService;
-    @Autowired
-    ParamService paramService;
-    @Autowired
-    SessionService sessionService;
     @Autowired
     HttpServletRequest request;
     @Autowired
@@ -113,24 +109,9 @@ public class UserController {
     @Autowired
     SecurityRestTemplate restTemplate;
 
-    public NguoiDung getNguoiDung() { // Lấy người dùng từ session và cookie
-        NguoiDung user = new NguoiDung();
-        if (sessionService.get("user") != null) {
-            user = sessionService.get("user");
-            return user;
-        } else if (cookieService.get("klb") != null) {
-            int id = Integer.parseInt(cookieService.getValue("klb"));
-            user = nguoiDungDao.findById(id).get();
-            return user;
-        }
-        return user = null;
-    }
-
-    @RequestMapping("/user/log-out")
-    public String logOut() {
-        cookieService.remove("klb");
-        sessionService.remove("user");
-        return "redirect:/user/login-register";
+    public NguoiDung getNguoiDung() { 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return  nguoiDungDAO.findByTenDangNhap(auth.getName()).get();
     }
 
     @GetMapping("/user/404")
@@ -151,25 +132,6 @@ public class UserController {
         return "user/index";
     }
 
-    // GET đăng nhập - đăng kí
-    @GetMapping("/user/login-register")
-    public String loginRegister(Model model, @RequestParam("error") Optional<String> error) {
-        model.addAttribute("login", new Login());
-        sessionService.remove("security-uri");
-
-        model.addAttribute("login", new Login());
-
-        var nguoidung = new NguoiDung();
-        model.addAttribute("login", nguoidung);
-        model.addAttribute("registry", nguoidung);
-
-        if (!error.isEmpty()) {
-            model.addAttribute("message", error.get());
-        }
-
-        return "user/login-register";
-    }
-
     @PostMapping("/user/contact")
     public String contact(Model model, @Valid @ModelAttribute("lienhe") LienHe lh, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -181,406 +143,8 @@ public class UserController {
         return "user/contact";
     }
 
-    // Đăng nhập
-    private int i = 0;
-
-    @PostMapping("/user/login-register")
-    public String processLoginForm(Model model, @Valid @ModelAttribute("login") Login login, BindingResult result) {
-        // Xử lý đăng nhập
-        var nguoidung = new NguoiDung();
-        model.addAttribute("registry", nguoidung); // set người dùng cho registry
-        Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id); // argon2
-        if (!result.hasErrors()) {
-            try {
-                NguoiDung user = nguoiDungDao.findBySdt(login.getSdt());
-
-                if (user.isTrangThaiKhoa()) {
-                    i = 0;
-                    model.addAttribute("message", "Tài khoản hiện đang bị khóa. Click vào ");
-                    model.addAttribute("link", " link sau để mở khóa");
-                    return "user/login-register";
-                }
-                if (i == 5) { // lock tài khoản
-                    user.setTrangThaiKhoa(true);
-                    nguoiDungDao.save(user);
-                }
-                // check mật khẩu
-                if (!argon2.verify(user.getMatKhau().trim(), login.getMatKhau())) {
-                    i = i + 1;
-                    model.addAttribute("message", "Mật khẩu không chính xác!");
-                    return "user/login-register";
-                } else {
-                    String uri = sessionService.get("security-uri");
-
-                    if (uri != null) {
-                        model.addAttribute("message", "Đăng nhập để tiếp tục");
-                        return "redirect:" + uri;
-                    } else {
-                        i = 0;
-                        model.addAttribute("message", "Đăng nhập thành công!");
-                        sessionService.set("user", user); // Gán cho session user
-                        if (paramService.getBoolean("rememberMe", false)) {
-                            cookieService.add("klb", String.valueOf(user.getNguoiDungId()), 10);
-                        }
-                        sessionService.remove("check");
-                        NguoiDung nd = sessionService.get("user");
-                        if (gioHangDAO.findByNguoiDung_NguoiDungId(nd.getNguoiDungId()) == null) {
-                            GioHang gioHang = new GioHang();
-                            gioHang.setNguoiDung(nd);
-                            gioHangDAO.save(gioHang);
-                        }
-                        return "redirect:/user/index";
-                    }
-                }
-            } catch (Exception e) {
-                model.addAttribute("message", "Số điện thoại hoặc mật khẩu không chính xác!");
-            }
-
-        }
-        return "user/login-register";
-    }
-
-    // Đăng ký (send otp + xử lý)
-    @RequestMapping("/user/login-register/registry")
-    public String getRegister(Model model, @Valid @ModelAttribute("registry") NguoiDung registry,
-            BindingResult result, RedirectAttributes rattrs) {
-        var nguoiDung = new NguoiDung();
-        model.addAttribute("login", nguoiDung);
-        try {
-            Pattern p = Pattern.compile(
-                    "^(?=.*[`!@#\\$%\\^&*()-=_+\\\\[\\\\]{}|;':\\\",./<>?])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])\\S{8,}$");
-            Matcher m = p.matcher(registry.getMatKhau());
-            Boolean e = m.matches();
-            if (!result.hasErrors()) {
-                Boolean check = true;
-                if (nguoiDungDao.findByTenDangNhap(registry.getTenDangNhap()) != null) {
-                    check = false;
-                    model.addAttribute("errorMessage", "Tên đăng nhập đã tồn tại!");
-                    return "user/login-register";
-                }
-                if (nguoiDungDao.findByEmail(registry.getEmail()) != null) {
-                    check = false;
-                    model.addAttribute("errorMessage", "Email đã tồn tại!");
-                    return "user/login-register";
-                }
-                if (nguoiDungDao.findBySdt(registry.getSdt()) != null) {
-                    check = false;
-                    model.addAttribute("errorMessage", "Số điện thoại đã tồn tại!");
-                    return "user/login-register";
-                }
-                if (e == false) {
-                    check = false;
-                    model.addAttribute("errorMessage", "Mật khẩu chưa đúng định dạng!");
-                    return "user/login-register";
-                }
-                if (!registry.getMatKhau().equals(request.getParameter("matKhauXN"))) {
-                    check = false;
-                    model.addAttribute("errorMessage", "Sai mật khẩu xác nhận!");
-                    return "user/login-register";
-                }
-                if (check == true) {
-                    registry.setMatKhau(hashedPassword.stringToArgon2(registry.getMatKhau()));
-                    nguoiDungDao.save(registry);
-
-                    model.addAttribute("errorMessage", "Đăng ký tài khoản thành công");
-
-                    String otp = "";
-                    String message = "";
-                    try {
-                        NguoiDung user = nguoiDungDao.findByEmail(registry.getEmail());
-
-                        Date curDate = new Date();
-                        MaXacNhan maXacNhan = maXacNhanDAO.findByNguoiDungId(user.getNguoiDungId());
-                        // MaXacNhan hết hạn tạo mã mới
-                        if (maXacNhan == null || maXacNhan.getDaXacNhan()
-                                || (curDate.compareTo(maXacNhan.getHanHieuLucOtp()) > 0)) {
-                            otp = OtpGenerator.generateOtp("otp_key");
-                            MaXacNhan mxacnhan = new MaXacNhan();
-                            mxacnhan.setNguoiDungId(user.getNguoiDungId());
-                            mxacnhan.setMaOtp(otp);
-                            mxacnhan.setNgayTaoOtp(new Date());
-                            maXacNhanDAO.save(mxacnhan);
-
-                            // Gửi email
-                            otpService.generateAndSendOtp(registry.getEmail(), "MÃ XÁC NHẬN KÍCH HOẠT TÀI KHOẢN");
-                            message = "Mã xác nhận sẽ được gửi đến email của bạn trong vài giây\r\n" +
-                                    "Mã có hiệu lực trong 5 phút";
-                        } else {// chưa hết hạn lấy mã cũ
-                            message = "Mã xác nhận đã được gửi vào email của bạn";
-                            otp = maXacNhan.getMaOtp();
-                        }
-                        model.addAttribute("message", message);
-                        model.addAttribute("email", registry.getEmail());
-                        return "user/active";
-                    } catch (Exception err) {
-                        model.addAttribute("message", "Email không tồn tại hoặc chưa được đăng ký!");
-                        err.printStackTrace();
-                    }
-
-                    return "user/active";
-                    // return "user/login-register";
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("errorMessage", "Lỗi");
-        }
-        return "user/login-register";
-    }
-
-    @GetMapping("/user/active")
-    public String activeAcc(Model model) {
-
-        model.addAttribute("message", "Mã xác nhận đã được gửi qua email của bạn.");
-        return "user/active";
-    }
-
-    @PostMapping("/user/active/{email}")
-    public String activeAcc(Model model, @PathVariable("email") String email, @RequestParam("otp") String usetotp) {
-        System.out.println(email);
-        try {
-            var user = nguoiDungDao.findByEmail(email);
-            var otp = maXacNhanDAO.findByNguoiDungId(user.getNguoiDungId());
-            if (usetotp.equals(otp.getMaOtp())) {
-                user.setTrangThaiKhoa(false);
-                nguoiDungDao.save(user);
-                model.addAttribute("message", "Tài khoản được kích hoạt thành công. Quay về trang ");
-                model.addAttribute("error", "đăng nhập");
-            }
-        } catch (Exception e) {
-            model.addAttribute("message", "Có lỗi xảy ra trong quá trình xử lý. Quay về trang ");
-            model.addAttribute("error", "đăng nhập");
-        }
-        return "user/active";
-    }
-
-    // Gửi email - quên mật khẩu
-    @RequestMapping("/user/forgot-password/sendmail")
-    public String sendCode(Model model, @Valid @ModelAttribute("sendForm") EmailForm sendForm, BindingResult result) {
-        String otp = "";
-        String message = "";
-        try {
-            NguoiDung user = nguoiDungDao.findByEmail(sendForm.getEmail());
-
-            Date curDate = new Date();
-            MaXacNhan maXacNhan = maXacNhanDAO.findByNguoiDungId(user.getNguoiDungId());
-            // MaXacNhan hết hạn tạo mã mới
-            if (maXacNhan == null || maXacNhan.getDaXacNhan()
-                    || (curDate.compareTo(maXacNhan.getHanHieuLucOtp()) > 0)) {
-                otp = OtpGenerator.generateOtp("otp_key");
-                MaXacNhan mxacnhan = new MaXacNhan();
-                mxacnhan.setNguoiDungId(user.getNguoiDungId());
-                mxacnhan.setMaOtp(otp);
-                mxacnhan.setNgayTaoOtp(new Date());
-                maXacNhanDAO.save(mxacnhan);
-
-                // Gửi email
-                otpService.generateAndSendOtp(sendForm.getEmail(), "MÃ XÁC NHẬN KHÔI PHỤC MẬT KHẨU");
-                message = "Mã xác nhận sẽ được gửi đến email của bạn trong vài giây\r\n" +
-                        "Mã có hiệu lực trong 5 phút";
-            } else {// chưa hết hạn lấy mã cũ
-                message = "Mã xác nhận đã được gửi vào email của bạn";
-                otp = maXacNhan.getMaOtp();
-            }
-
-            model.addAttribute("message", message);
-            return "user/send-code";
-        } catch (Exception e) {
-            model.addAttribute("message", "Email không tồn tại hoặc chưa được đăng ký!");
-            e.printStackTrace();
-        }
-        return "user/send-code";
-    }
-
-    // GET Quên mật khẩu
-    @GetMapping("/user/forgot-password")
-    public String getForgotPassword(Model model) {
-        EmailForm emailForm = new EmailForm();
-        model.addAttribute("sendForm", emailForm);
-        model.addAttribute("useHeader", getNguoiDung());
-
-        return "user/send-code";
-    }
-
-    // Sang trang quên mk
-    @PostMapping("/user/forgot-password")
-    public String postForgotPassword(Model model, @Valid @ModelAttribute("sendForm") EmailForm sendForm,
-            BindingResult result) {
-        String message = "Email của bạn chưa được đăng ký";
-
-        if (result.hasErrors()) {
-            // in lỗi
-        } else {
-            try {
-                NguoiDung user = nguoiDungDao.findByEmail(sendForm.getEmail());
-                MaXacNhan otp = maXacNhanDAO.findByNguoiDungId(user.getNguoiDungId());
-                Date curDate = new Date();
-                if (otp != null && !otp.getDaXacNhan() && !(curDate.compareTo(otp.getHanHieuLucOtp()) > 0)) {
-                    if (sendForm.getEmail().equals(user.getEmail()) && sendForm.getMxn().equals(otp.getMaOtp())) {
-                        sessionService.set("user-email", user.getEmail());
-                        return "redirect:/user/change-password";
-                    } else if (!sendForm.getEmail().equals(user.getEmail())) {
-                        message = "Địa chỉ email không hợp lệ";
-                    } else {
-                        message = "Mã xác nhận không chính xác";
-                    }
-                } else {
-                    message = "Mã xác nhận không chính xác";
-                }
-            } catch (Exception e) {
-                model.addAttribute("message", "Mã xác nhận không đúng!");
-            }
-            model.addAttribute("message", message);
-        }
-        return "user/send-code";
-    }
-
-    // GET Đổi mật khẩu
-    @GetMapping("/user/change-password")
-    public String changePassword(Model model, @ModelAttribute("changeNewPassword") ChangePass change) {
-        model.addAttribute("nguoidung", getNguoiDung());
-        model.addAttribute("usercheck", sessionService.get("user"));
-        return "user/change-password";
-    }
-
-    // Đổi mật khẩu xử lý
-    @PostMapping("/user/change-password")
-    public String changePassword(Model model, @Valid @ModelAttribute("changeNewPassword") ChangePass change,
-            BindingResult result) {
-
-        model.addAttribute("nguoidung", getNguoiDung());
-        model.addAttribute("usercheck", sessionService.get("user"));
-        if (!result.hasErrors()) {
-            NguoiDung nguoiDung = nguoiDungDao.findByEmail(sessionService.get("user-email"));
-            Pattern p = Pattern.compile(
-                    "^(?=.*[`!@#\\$%\\^&*()-=_+\\\\[\\\\]{}|;':\\\",./<>?])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])\\S{8,}$");
-            Matcher m = p.matcher(change.getNewPass());
-            Boolean b = m.matches();
-
-            if (b == false) {
-                model.addAttribute("message", "Mật khẩu chưa đúng định dạng!");
-                return "user/change-password";
-            }
-            if (change.getNewPass().equals(change.getSubPass())) {
-                try {
-                    nguoiDung.setMatKhau(hashedPassword.stringToArgon2(change.getNewPass()));
-                    nguoiDungDao.save(nguoiDung);
-                    model.addAttribute("message", "Đổi mật khẩu thành công");
-                    sessionService.remove("user-email");
-                    return "user/change-password";
-                } catch (Exception e) {
-                    model.addAttribute("message", "Có lỗi xảy ra. Quay về ");
-                    model.addAttribute("error", "trang đăng nhập");
-                    return "user/change-password";
-                }
-            } else {
-                model.addAttribute("message", "Mật khẩu xác nhận không chính xác");
-            }
-        }
-        return "user/change-password";
-    }
-
-    // Gửi mail unlock account
-    @GetMapping("/user/unlock-account")
-    public String getUnlockAccount(Model model, @RequestParam("sdt") String phone,
-            @ModelAttribute("unlockFrom") UnlockAcc unlockAccount) {
-        String otp = "";
-        String message = "";
-        model.addAttribute("unlockFrom", new UnlockAcc());
-        try {
-            NguoiDung user = nguoiDungDao.findBySdt(phone);
-
-            Date curDate = new Date();
-            MaXacNhan maXacNhan = maXacNhanDAO.findByNguoiDungId(user.getNguoiDungId());
-            // MaXacNhan hết hạn tạo mã mới
-            if (maXacNhan == null || maXacNhan.getDaXacNhan()
-                    || (curDate.compareTo(maXacNhan.getHanHieuLucOtp()) > 0)) {
-                otp = OtpGenerator.generateOtp("otp_key");
-                MaXacNhan mxacnhan = new MaXacNhan();
-                mxacnhan.setNguoiDungId(user.getNguoiDungId());
-                mxacnhan.setMaOtp(otp);
-                mxacnhan.setNgayTaoOtp(new Date());
-                maXacNhanDAO.save(mxacnhan);
-
-                // Gửi email
-                otpService.generateAndSendOtp(user.getEmail(), "MÃ XÁC NHẬN KHÔI PHỤC TÀI KHOẢN");
-                message = "Mã xác nhận sẽ được gửi đến email của bạn trong vài giây\r\n" +
-                        "Mã có hiệu lực trong 5 phút";
-            } else {// chưa hết hạn lấy mã cũ
-                message = "Mã xác nhận đã được gửi vào email của bạn";
-                otp = maXacNhan.getMaOtp();
-            }
-            // Lưu tài khoản vào session cập nhật
-            sessionService.set("user-phone", user.getSdt());
-
-            model.addAttribute("message", message);
-            return "user/unlock-account";
-        } catch (Exception e) {
-            model.addAttribute("message", "Có lỗi xảy ra. Quay về trang ");
-            model.addAttribute("error", "đăng nhập");
-            e.printStackTrace();
-        }
-        return "user/unlock-account";
-    }
-
-    // Gửi mã mở khóa tài khoản
-    @PostMapping("/user/unlock-account")
-    public String postUnlockAccount(Model model, @Valid @ModelAttribute("unlockFrom") UnlockAcc unlockForm,
-            BindingResult result) {
-        cookieService.remove("klb");
-        String phone = sessionService.get("user-phone");
-        if (!result.hasErrors()) {
-
-            try {
-                Pattern p = Pattern.compile(
-                        "^(?=.*[`!@#\\$%\\^&*()-=_+\\\\[\\\\]{}|;':\\\",./<>?])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])\\S{8,}$");
-                Matcher m = p.matcher(unlockForm.getNewPass());
-                Boolean b = m.matches();
-
-                NguoiDung user = nguoiDungDao.findBySdt(phone);
-                MaXacNhan mxn = maXacNhanDAO.findByNguoiDungId(user.getNguoiDungId());
-                if (b == false) {
-                    model.addAttribute("message", "Mật khẩu chưa đúng định dạng!");
-                    return "user/unlock-account";
-                }
-                if (unlockForm.getSubCode() == "") {
-                    model.addAttribute("message", "Hãy nhập mã xác nhận!");
-                    return "user/unlock-account";
-                }
-                if (!unlockForm.getSubCode().equals(mxn.getMaOtp())) {
-                    model.addAttribute("message", "Mã xác nhận không chính xác!");
-                    return "user/unlock-account";
-                }
-                if (unlockForm.getNewPass().equals(unlockForm.getSubPass())) {
-                    try {
-                        user.setTrangThaiKhoa(false);
-                        user.setMatKhau(hashedPassword.stringToArgon2(unlockForm.getNewPass()));
-                        nguoiDungDao.save(user);
-                        sessionService.remove("user-phone");
-                        model.addAttribute("message", "Đổi mật khẩu thành công. Về trang");
-                        model.addAttribute("error", " đăng nhập");
-                        sessionService.remove("user-email");
-                        return "user/unlock-account";
-                    } catch (Exception e) {
-                        model.addAttribute("message", "Có lỗi xảy ra. Quay về ");
-                        model.addAttribute("error", "trang đăng nhập");
-                        return "user/unlock-account?sdt=" + phone;
-                    }
-                } else {
-                    model.addAttribute("message", "Mật khẩu xác nhận không chính xác");
-                }
-                return "user/unlock-account";
-            } catch (Exception e) {
-                model.addAttribute("message", "Có lỗi xảy ra. Quay về trang ");
-                model.addAttribute("error", "đăng nhập");
-                e.printStackTrace();
-            }
-        }
-        return "user/unlock-account";
-    }
-
     @GetMapping("/user/profile")
-    public String profile(Model model, @ModelAttribute("userProfile") NguoiDungDTO user) {
+    public String profileDTP(Model model, @ModelAttribute("userProfile") NguoiDungDTO user) {
         NguoiDung userForm = getNguoiDung();
         NguoiDungDTO nddto = new NguoiDungDTO();
         nddto.setTenDangNhap(userForm.getTenDangNhap());
@@ -622,9 +186,9 @@ public class UserController {
 
         NguoiDung user = getNguoiDung();
 
-        NguoiDung userName = nguoiDungDao.findByTenDangNhap(userForm.getTenDangNhap());
-        NguoiDung userPhone = nguoiDungDao.findBySdt(userForm.getSdt());
-        NguoiDung userEmail = nguoiDungDao.findByEmail(userForm.getEmail());
+        NguoiDung userName = nguoiDungDao.findByTenDangNhap(userForm.getTenDangNhap()).get();
+        NguoiDung userPhone = nguoiDungDao.findBySdt(userForm.getSdt()).get();
+        NguoiDung userEmail = nguoiDungDao.findByEmail(userForm.getEmail()).get();
 
         String diaChi = userForm.getDiaChi().trim();
         diaChi = diaChi.replace(",", "");
@@ -655,70 +219,6 @@ public class UserController {
         return "user/profile";
     }
 
-    // GET Đổi mật khẩu từ profile
-    @GetMapping("/user/profile/change-password/{email}")
-    public String changePasswordProfile(Model model, @ModelAttribute("changeNewPassword") ChangePass change,
-            @PathVariable("email") String email) {
-        model.addAttribute("nguoidung", getNguoiDung());
-        model.addAttribute("usercheck", sessionService.get("user"));
-        return "user/change-password-profile";
-    }
-
-    // Đổi mật khẩu xử lý từ profile
-    @PostMapping("/user/profile/change-password/{email}")
-    public String changePasswordProfile(Model model, @Valid @ModelAttribute("changeNewPassword") ChangePass change,
-            BindingResult result, @PathVariable("email") String email) {
-
-        model.addAttribute("nguoidung", getNguoiDung());
-        model.addAttribute("usercheck", sessionService.get("user"));
-        if (!result.hasErrors()) {
-            // NguoiDung nguoiDung =
-            // nguoiDungDao.findByEmail(sessionService.get("user-email"));
-            NguoiDung nguoiDung = nguoiDungDao.findByEmail(email);
-            Pattern p = Pattern.compile(
-                    "^(?=.*[`!@#\\$%\\^&*()-=_+\\\\[\\\\]{}|;':\\\",./<>?])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])\\S{8,}$");
-            Matcher m = p.matcher(change.getNewPass());
-            Boolean b = m.matches();
-            Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id); // argon2
-
-            if (getNguoiDung() != null) { // Lấy người dùng trong cookie boặc session nếu có tồn tại
-                nguoiDung = getNguoiDung();
-
-                if (change.getCurPass() == "") {
-                    model.addAttribute("message", "Hãy nhập mật khẩu hiện tại!");
-                    return "user/change-password-profile";
-                }
-                if (!argon2.verify(nguoiDung.getMatKhau().trim(), change.getCurPass())) {
-                    model.addAttribute("message", "Mật khẩu hiện tại chưa chính xác!");
-                    return "user/change-password-profile";
-                }
-                if (b == false) {
-                    model.addAttribute("message", "Mật khẩu chưa đúng định dạng!");
-                    return "user/change-password-profile";
-                }
-                if (change.getNewPass().equals(change.getSubPass())) {
-                    try {
-                        nguoiDung.setMatKhau(hashedPassword.stringToArgon2(change.getNewPass()));
-                        nguoiDungDao.save(nguoiDung);
-                        model.addAttribute("message", "Đổi mật khẩu thành công");
-                        sessionService.remove("user-email");
-                        return "user/change-password-profile";
-                    } catch (Exception e) {
-                        model.addAttribute("message", "Có lỗi xảy ra. Quay về ");
-                        model.addAttribute("error", "trang đăng nhập");
-                        return "user/change-password-profile";
-                    }
-                } else {
-                    model.addAttribute("message", "Mật khẩu xác nhận không chính xác");
-                }
-            } else {
-                model.addAttribute("message", "Có lỗi xảy ra trong quá trình xử lý. Quay về ");
-                model.addAttribute("error", "trang chủ.");
-            }
-        }
-        return "user/change-password-profile";
-    }
-
     @GetMapping("/user/orders-list")
     public String getOrderList() {
 
@@ -747,7 +247,7 @@ public class UserController {
 
     @GetMapping("/user/checkout")
     public String checkout(Model model) {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         List<HinhThucThanhToan> paymentMethods = htttDAO.findAll();
         model.addAttribute("nguoiDung", nguoiDung);
         model.addAttribute("cart", restTemplate.get("http://localhost:8080/checkoutCart?address="
@@ -772,7 +272,7 @@ public class UserController {
             @RequestParam(value = "ghiChu", required = false) String ghiChu,
             Model model) throws InvalidKeyException, UnsupportedEncodingException, UnknownHostException,
             SignatureException, NoSuchAlgorithmException {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         JsonNode map = restTemplate.get("http://localhost:8080/checkoutSpecifiedCart?address=" + nguoiDung.getDiaChi()
                 + "&userId=" + nguoiDung.getNguoiDungId());
         {
@@ -850,7 +350,7 @@ public class UserController {
 
     @GetMapping("/user/contact")
     public String contact(Model model) {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         if (nguoiDung == null) {
             model.addAttribute("lienhe", new LienHe());
         } else {
@@ -1013,7 +513,7 @@ public class UserController {
 
     @GetMapping("/user/shopping-cart")
     public String shoppingCart(Model model) {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         if (nguoiDung != null) {
             chiTietGioHangDAO.kiemTraVaXoaSanPhamKhongHopLeTrongGioHang(nguoiDung.getNguoiDungId());
             AllChiTietGioHangDTO allChiTietGioHangDTO = new AllChiTietGioHangDTO(
@@ -1034,17 +534,10 @@ public class UserController {
         return "user/wishlist";
     }
 
-    public Double getTotalAmountOrder(List<ChiTietDonHang> list) {
-        Double total = 0.0;
-        for (ChiTietDonHang ctdh : list) {
-            total += ctdh.getGiaBan() * ctdh.getSoLuong();
-        }
-        return total;
-    }
 
     // @GetMapping("/user/order")
     // public String getOrder(Model model) {
-    // NguoiDung nguoiDung = sessionService.get("user");
+    // NguoiDung nguoiDung = getNguoiDung();
     // if (nguoiDung != null) {
     // List<DonHang> donHangs =
     // donHangDAO.findByNguoiDung_NguoiDungId(nguoiDung.getNguoiDungId());
@@ -1057,7 +550,7 @@ public class UserController {
     // }
     @GetMapping("/user/find-order")
     public String findOrder(@RequestParam(name = "donHangId", required = false) Integer donHangId, Model model) {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         if (nguoiDung != null) {
             DonHang dh = donHangDAO.findById(donHangId).orElse(null);
             model.addAttribute("donHangs", dh);
@@ -1071,7 +564,7 @@ public class UserController {
     @GetMapping("/user/order-details")
     public String getOrder(@RequestParam(name = "donHangId", required = false) Integer donHangId,
             Model model) {
-        NguoiDung nguoiDung = sessionService.get("user");
+        NguoiDung nguoiDung = getNguoiDung();
         if (nguoiDung != null) {
             List<ChiTietDonHang> ctdh = chiTietDonHangDAO.findByDonHangId(donHangId);
             model.addAttribute("chiTietDonHangLists", ctdh);

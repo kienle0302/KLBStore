@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/user/user}">
+
+<head>
+  <title>KLB Store</title>
+</head>
+
+<body>
+  <div layout:fragment="content">
+    <div class="breadcrumb-area">
+      <div class="container">
+        <div class="breadcrumb-content">
+          <ul>
+            <li><a href="/user/index">Trang chủ</a></li>
+            <li class="active">Cập Nhật Số Điện Thoại</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="page-section mb-60">
+      <div class="container">
+        <div class="row d-flex justify-content-center">
+          <div class="col-sm-12 col-xs-12 col-lg-6 mb-30">
+
+            <form th:action="@{/user/update-phone-number}" method="post">
+              <div class="login-form">
+                <h4 class="login-title">Cập Nhật Số Điện Thoại</h4>
+                <div class="row">
+                  <div class="col-md-12 col-12 mb-20">
+                    <label>Số điện thoại</label>
+                    <input class="mb-0" type="text" placeholder="Nhập số điện thoại của bạn" pattern="^[a-zA-Z0-9_-]{3,16}$" required>
+                    <span class="text-danger error" ></span>
+                  </div>
+                  
+                  <div class="col-md-12" style="text-align: center;">
+                    <button class="btn btn-primary btn-block">Cập nhật</button>
+                  </div>
+                  
+                </div>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body>
+
+</html>

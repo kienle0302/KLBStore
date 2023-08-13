@@ -1,6 +1,10 @@
 package com.klbstore.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -25,48 +29,52 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
             HttpServletResponse response, Object handler) throws Exception {
 
-        String uri = request.getRequestURI();
-        NguoiDung user = sessionService.get("user"); // lấy từ session
+        // String uri = request.getRequestURI();
+        // NguoiDung user = sessionService.get("user"); // lấy từ session
 
-        if (cookieService.get("klb") != null) {
-            int id = Integer.parseInt(cookieService.getValue("klb"));
-            user = nguoiDungDAO.findById(id).get();
-        }
-
-        request.setAttribute("useHeader", user);
-
-        String error = "";
-
-        if (user == null) { // chưa đăng nhập
-            error = "Please login!";
-        } else if (user.isTrangThaiKhoa()) { // chưa đăng nhập
-            error = "Your account is locked!";
-        } else if (!user.getQuyenDangNhap() && uri.startsWith("/admin/")) { // Không đúng vai trò
-            error = "Access denied!"; // Truy cập bị từ chối
-        }
-        if (error.length() > 0) { // Có lỗi
-            sessionService.set("security-uri", uri);
-            response.sendRedirect("/user/login-register?error=" + error);
-            return false;
-        }
+        // if (cookieService.get("klb") != null) {
+        // int id = Integer.parseInt(cookieService.getValue("klb"));
+        // user = nguoiDungDAO.findById(id).get();
+        // }
 
         return true;
     }
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-            ModelAndView modelAndView) throws Exception {
-
-        NguoiDung user = sessionService.get("user"); // lấy từ session
-
-        if (cookieService.get("klb") != null) {
-            int id = Integer.parseInt(cookieService.getValue("klb"));
-            user = nguoiDungDAO.findById(id).get();
-        }
-        request.setAttribute("useHeader", user);
+            @Nullable ModelAndView modelAndView) throws Exception {
         if (modelAndView != null) {
-            modelAndView.addObject("useHeader", "user");
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+            if (!(auth instanceof AnonymousAuthenticationToken)) {
+                String currentUserName = auth.getName();
+                modelAndView.addObject("userLogged", currentUserName);
+            } else {
+                NguoiDung user = sessionService.get("usenameSS"); // lấy từ session
+
+                if (cookieService.get("usenameCK") != null) {
+                    int id = Integer.parseInt(cookieService.getValue("usenameCK"));
+                    user = nguoiDungDAO.findById(id).get();
+                }
+
+                String currentUserName = auth.getName();
+                modelAndView.addObject("userLogged", currentUserName);
+                modelAndView.addObject("userLogged", user);
+            }
         }
+
+        // NguoiDung user = sessionService.get("user"); // lấy từ session
+
+        // if (cookieService.get("klb") != null) {
+        // int id = Integer.parseInt(cookieService.getValue("klb"));
+        // user = nguoiDungDAO.findById(id).get();
+        // }
+        // request.setAttribute("useHeader", user);
+        // // Lưu người dùng vào request.
+        // if (modelAndView != null) {
+        // modelAndView.addObject("useHeader", "user");
+        // }
+
     }
 
 }

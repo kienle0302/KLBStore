@@ -9,16 +9,16 @@ public class OtpService {
     @Autowired
     private MailerService mailerService;
 
-    public String generateAndSendOtp(String email, String subject) {
+    public String generateAndSendOtp(String email, String subject, String link) {
         String otp = OtpGenerator.generateOtp("otp_key");
         String to = email;
-        String body = generateEmailTemplate(otp);
+        String body = generateEmailTemplate(otp, link);
 
         mailerService.queue(to, subject, body);
         return otp;
     }
-    
-    private String generateEmailTemplate(String otp) {
+
+    private String generateEmailTemplate(String otp, String link) {
         return "<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head>\n" +
@@ -81,7 +81,7 @@ public class OtpService {
                 +
                 "            <div class=\"code\">\n" +
                 "                <p>Mã xác minh tài khoản:</p>\n" +
-                "                <p><strong>" + otp + "</strong></p>\n" +
+                "                <p>Tiến hành xác thực <a href=\""+link+"\">tại đây</a></p>\n" +
                 "            </div>\n" +
                 "            <p><strong>Gặp vấn đề với mã này?</strong></p>\n" +
                 "            <p>Xem lỗi và đảm bảo rằng email của bạn vẫn đang hoạt động. Nếu không phải, hãy tìm kiếm một email cập nhật hoặc yêu cầu một mã mới.</p>\n"
